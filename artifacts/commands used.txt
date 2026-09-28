@@ -11,3 +11,6 @@ create a frontend that connects to this backend .use html,css,js.make it a simpl
 implement a download log feature which should download the audit logs with timestamps ,as a md or txt file  [/plan](slashCommand;plan)  also implement pagination on the table max:5 entries.if anything needed attention the page no blinks until read.(like changes in state of the worker,room,etc).and as said in the agent.txt implement the opt features.
 
 to handle mistakes 1 single action revert button(reverts the last action and logs it in the log as reverted ) and a delete a action or a worker or room a small delete button in red (bin icon) not emoji 
+
+
+there is a slight change in the frontend .each part should be induvidual (page or section ) .the pagination could be increased.make some changes in color pallete if possible adapt device color themeing(adaptive) or m3 express like themes and design.on other thinking m3 might be better choice .on hover button turns black left to right smoothly not fasted if possible the animation could be like ease out -timings .on click changes to dark color of the button's native color..[/plan](slashCommand;plan) 

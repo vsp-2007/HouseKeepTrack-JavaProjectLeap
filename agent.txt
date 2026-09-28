@@ -134,9 +134,8 @@ for writemode any issues are design implemented changes report here {
 
 7. Frontend UI Enhancements (index.html):
    - Single Download Button: " Download Audit Logs" in portal header and Audit section, launching a format picker modal asking for Markdown (.md) or Plain Text (.txt), triggering direct file download with formatted timestamp filenames.
-   - 5-Item Table Pagination: Max 5 entries per page for Rooms, Cleaning Tasks, Housekeeper Staff, Supervisor Inspections, and Audit Logs with [« Prev] [ 1 ] [ 2 ] [Next »] controls and item ranges.
    - Blinking Page Number Alert: Keyframes pulse/blink animation (@keyframes alertBlinkRedAmber in red-amber with glowing indicator) on page number buttons when unread changes occur on non-viewed pages (status changes, task queues, staff availability, or new audit entries), automatically extinguished once user navigates to and reads that page.
-   - Operational Audit Trail Section: Displays recent audit logs paginated 5 per page with color-coded action badges, actor, entity ID, and event details.
+   - Operational Audit Trail Section: Displays recent audit logs paginated with color-coded action badges, actor, entity ID, and event details.
 
 8. Mistake-Handling Revert & Safe Deletion Operations:
    - Single Action Revert ("↺ Revert Last Action"):
@@ -165,4 +164,28 @@ for writemode any issues are design implemented changes report here {
      * RoomPresenterTest (2 tests)
      * GlobalExceptionHandlerTest (6 tests)
    - Total Tests Run: 78, Failures: 0, Errors: 0, Skipped: 0. Status: BUILD SUCCESS (`mvn clean test`).
+
+10. Material 3 (M3) Expressive Frontend Redesign (index.html):
+    - Individual Section Navigation (M3 Segmented Nav Bar):
+      * Replaced the vertically stacked single-column layout with an M3 pill segmented navigation bar:
+        - 1. Dashboard (Overview KPI cards, turnaround metrics, quick system actions, room status distribution grid)
+        - 2. Rooms (Hotel room registry, status badges, check-in/checkout/ready actions, add room form)
+        - 3. Cleaning Tasks (Priority queue, assigned housekeepers, complete task, queue dispatch)
+        - 4. Housekeepers (Staff roster, availability toggles, workload stats, staff registration)
+        - 5. Inspections (Supervisor inspection history, evaluation modal)
+        - 6. Audit Trail (Operational event log, revert action, download button with format picker)
+      * Clean view rendering: only the active section is rendered; inactive sections are cleanly hidden with smooth fadeIn animation.
+      * Unread tab alert pulsing: when status changes or background events occur on an inactive tab, its navigation pill button gently pulses with a slow yellow alert animation (@keyframes alertBlinkYellowSlow over 2.4s) with zero transforms and no badges, completely eliminating layout shifts and scrollbars.
+    - Increased Pagination with Inline Page Size Selector:
+      * Increased default table pagination from 5 to 10 entries per page (DEFAULT_PAGE_SIZE = 10).
+      * Added an inline page size selector dropdown (Show: 5 | 10 | 20 entries) on every table, with real-time dynamic re-rendering.
+    - Material 3 Expressive & Adaptive Theming:
+      * Standard M3 CSS custom properties (--md-sys-color-*) with automatic device theming via @media (prefers-color-scheme: dark).
+      * Header theme toggle button (Theme: Auto / Theme: Light / Theme: Dark) with localStorage persistence and explicit data-theme attribute override.
+      * M3 expressive styling: border-radius 16px for cards, containers, and modals; border-radius 9999px for pill chips, badges, and segmented nav tabs; Roboto system font stack; tonal surface elevation levels.
+    - Custom Button Micro-Interactions:
+      * Left-to-Right Hover: Action buttons turn black smoothly via ::before sliding from left: -100% to left: 0% over 0.42s with cubic-bezier(0.16, 1, 0.3, 1), while navigation tabs (.nav-tab-btn) and pagination buttons (.page-btn) are protected from black hover overlays to maintain crisp legibility and preserve unread alert dot badges.
+      * Tactile Click (:active): The black hover overlay hides (opacity: 0) and action buttons snap to a deep, saturated shade of their native color (green: #1b5e20, blue: #003e75, orange: #b23c00, red: #8e0000, purple: #4a148c, teal: #004d40) with scale(0.96) press effect.
+    - Complete Preservation of Features:
+      * Preserved single-action revert ("Revert Last Action"), small red delete buttons with inline SVG trash bin icons (NO emoji), download modal (.md / .txt with download arrow icon), and supervisor inspection modal dialog.
 }

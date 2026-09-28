@@ -6,160 +6,579 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HouseKeepTrack - Hotel Housekeeping Management Portal</title>
     <style>
+        /* ==========================================================================
+           Material 3 Expressive & Device-Adaptive Theming (Light / Dark)
+           ========================================================================== */
+        :root {
+            /* Light Theme Tokens */
+            --md-sys-color-primary: #005ac1;
+            --md-sys-color-on-primary: #ffffff;
+            --md-sys-color-primary-container: #d8e2ff;
+            --md-sys-color-on-primary-container: #001a41;
+
+            --md-sys-color-secondary: #575e71;
+            --md-sys-color-on-secondary: #ffffff;
+            --md-sys-color-secondary-container: #dbe2f9;
+            --md-sys-color-on-secondary-container: #141b2c;
+
+            --md-sys-color-tertiary: #715573;
+            --md-sys-color-on-tertiary: #ffffff;
+            --md-sys-color-tertiary-container: #fbd7fc;
+            --md-sys-color-on-tertiary-container: #29132d;
+
+            --md-sys-color-error: #ba1a1a;
+            --md-sys-color-on-error: #ffffff;
+            --md-sys-color-error-container: #ffdad6;
+            --md-sys-color-on-error-container: #410002;
+
+            --md-sys-color-background: #f8f9fc;
+            --md-sys-color-on-background: #191c20;
+
+            --md-sys-color-surface: #ffffff;
+            --md-sys-color-on-surface: #191c20;
+            --md-sys-color-surface-dim: #ded8e1;
+            --md-sys-color-surface-bright: #fef7ff;
+            --md-sys-color-surface-container-lowest: #ffffff;
+            --md-sys-color-surface-container-low: #f3f3f7;
+            --md-sys-color-surface-container: #edeef2;
+            --md-sys-color-surface-container-high: #e7e8ec;
+            --md-sys-color-surface-container-highest: #e1e2e6;
+
+            --md-sys-color-outline: #74777f;
+            --md-sys-color-outline-variant: #c4c6d0;
+
+            --md-sys-color-success: #1b6d31;
+            --md-sys-color-on-success: #ffffff;
+            --md-sys-color-success-container: #d4edda;
+            --md-sys-color-on-success-container: #155724;
+
+            --md-sys-color-warning: #944a00;
+            --md-sys-color-on-warning: #ffffff;
+            --md-sys-color-warning-container: #ffeeba;
+            --md-sys-color-on-warning-container: #856404;
+
+            --md-elevation-1: 0px 1px 3px 1px rgba(0, 0, 0, 0.08), 0px 1px 2px 0px rgba(0, 0, 0, 0.12);
+            --md-elevation-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.08), 0px 1px 2px 0px rgba(0, 0, 0, 0.14);
+            --md-elevation-3: 0px 4px 12px 3px rgba(0, 0, 0, 0.10), 0px 1px 4px 0px rgba(0, 0, 0, 0.16);
+
+            --app-font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+        }
+
+        /* Automatic Device Dark Theming */
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --md-sys-color-primary: #adc6ff;
+                --md-sys-color-on-primary: #002e69;
+                --md-sys-color-primary-container: #004494;
+                --md-sys-color-on-primary-container: #d8e2ff;
+
+                --md-sys-color-secondary: #bfc6dc;
+                --md-sys-color-on-secondary: #293041;
+                --md-sys-color-secondary-container: #3f4759;
+                --md-sys-color-on-secondary-container: #dbe2f9;
+
+                --md-sys-color-tertiary: #dfbbde;
+                --md-sys-color-on-tertiary: #402843;
+                --md-sys-color-tertiary-container: #583e5a;
+                --md-sys-color-on-tertiary-container: #fbd7fc;
+
+                --md-sys-color-error: #ffb4ab;
+                --md-sys-color-on-error: #690005;
+                --md-sys-color-error-container: #93000a;
+                --md-sys-color-on-error-container: #ffdad6;
+
+                --md-sys-color-background: #111318;
+                --md-sys-color-on-background: #e2e2e9;
+
+                --md-sys-color-surface: #191c20;
+                --md-sys-color-on-surface: #e2e2e9;
+                --md-sys-color-surface-dim: #111318;
+                --md-sys-color-surface-bright: #37393e;
+                --md-sys-color-surface-container-lowest: #0c0e13;
+                --md-sys-color-surface-container-low: #191c20;
+                --md-sys-color-surface-container: #1d2024;
+                --md-sys-color-surface-container-high: #282a2f;
+                --md-sys-color-surface-container-highest: #33353a;
+
+                --md-sys-color-outline: #8e9099;
+                --md-sys-color-outline-variant: #44474f;
+
+                --md-sys-color-success: #7cdb8c;
+                --md-sys-color-on-success: #003912;
+                --md-sys-color-success-container: #00531d;
+                --md-sys-color-on-success-container: #b3f2be;
+
+                --md-sys-color-warning: #ffb77d;
+                --md-sys-color-on-warning: #4e2600;
+                --md-sys-color-warning-container: #703800;
+                --md-sys-color-on-warning-container: #ffdcbe;
+
+                --md-elevation-1: 0px 1px 3px 1px rgba(0, 0, 0, 0.40), 0px 1px 2px 0px rgba(0, 0, 0, 0.50);
+                --md-elevation-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.40), 0px 1px 2px 0px rgba(0, 0, 0, 0.50);
+                --md-elevation-3: 0px 4px 12px 3px rgba(0, 0, 0, 0.55), 0px 1px 4px 0px rgba(0, 0, 0, 0.60);
+            }
+        }
+
+        /* Explicit Dark Mode Override */
+        [data-theme="dark"] {
+            --md-sys-color-primary: #adc6ff;
+            --md-sys-color-on-primary: #002e69;
+            --md-sys-color-primary-container: #004494;
+            --md-sys-color-on-primary-container: #d8e2ff;
+
+            --md-sys-color-secondary: #bfc6dc;
+            --md-sys-color-on-secondary: #293041;
+            --md-sys-color-secondary-container: #3f4759;
+            --md-sys-color-on-secondary-container: #dbe2f9;
+
+            --md-sys-color-tertiary: #dfbbde;
+            --md-sys-color-on-tertiary: #402843;
+            --md-sys-color-tertiary-container: #583e5a;
+            --md-sys-color-on-tertiary-container: #fbd7fc;
+
+            --md-sys-color-error: #ffb4ab;
+            --md-sys-color-on-error: #690005;
+            --md-sys-color-error-container: #93000a;
+            --md-sys-color-on-error-container: #ffdad6;
+
+            --md-sys-color-background: #111318;
+            --md-sys-color-on-background: #e2e2e9;
+
+            --md-sys-color-surface: #191c20;
+            --md-sys-color-on-surface: #e2e2e9;
+            --md-sys-color-surface-dim: #111318;
+            --md-sys-color-surface-bright: #37393e;
+            --md-sys-color-surface-container-lowest: #0c0e13;
+            --md-sys-color-surface-container-low: #191c20;
+            --md-sys-color-surface-container: #1d2024;
+            --md-sys-color-surface-container-high: #282a2f;
+            --md-sys-color-surface-container-highest: #33353a;
+
+            --md-sys-color-outline: #8e9099;
+            --md-sys-color-outline-variant: #44474f;
+
+            --md-sys-color-success: #7cdb8c;
+            --md-sys-color-on-success: #003912;
+            --md-sys-color-success-container: #00531d;
+            --md-sys-color-on-success-container: #b3f2be;
+
+            --md-sys-color-warning: #ffb77d;
+            --md-sys-color-on-warning: #4e2600;
+            --md-sys-color-warning-container: #703800;
+            --md-sys-color-on-warning-container: #ffdcbe;
+
+            --md-elevation-1: 0px 1px 3px 1px rgba(0, 0, 0, 0.40), 0px 1px 2px 0px rgba(0, 0, 0, 0.50);
+            --md-elevation-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.40), 0px 1px 2px 0px rgba(0, 0, 0, 0.50);
+            --md-elevation-3: 0px 4px 12px 3px rgba(0, 0, 0, 0.55), 0px 1px 4px 0px rgba(0, 0, 0, 0.60);
+        }
+
+        /* Explicit Light Mode Override */
+        [data-theme="light"] {
+            --md-sys-color-primary: #005ac1;
+            --md-sys-color-on-primary: #ffffff;
+            --md-sys-color-primary-container: #d8e2ff;
+            --md-sys-color-on-primary-container: #001a41;
+
+            --md-sys-color-secondary: #575e71;
+            --md-sys-color-on-secondary: #ffffff;
+            --md-sys-color-secondary-container: #dbe2f9;
+            --md-sys-color-on-secondary-container: #141b2c;
+
+            --md-sys-color-tertiary: #715573;
+            --md-sys-color-on-tertiary: #ffffff;
+            --md-sys-color-tertiary-container: #fbd7fc;
+            --md-sys-color-on-tertiary-container: #29132d;
+
+            --md-sys-color-error: #ba1a1a;
+            --md-sys-color-on-error: #ffffff;
+            --md-sys-color-error-container: #ffdad6;
+            --md-sys-color-on-error-container: #410002;
+
+            --md-sys-color-background: #f8f9fc;
+            --md-sys-color-on-background: #191c20;
+
+            --md-sys-color-surface: #ffffff;
+            --md-sys-color-on-surface: #191c20;
+            --md-sys-color-surface-dim: #ded8e1;
+            --md-sys-color-surface-bright: #fef7ff;
+            --md-sys-color-surface-container-lowest: #ffffff;
+            --md-sys-color-surface-container-low: #f3f3f7;
+            --md-sys-color-surface-container: #edeef2;
+            --md-sys-color-surface-container-high: #e7e8ec;
+            --md-sys-color-surface-container-highest: #e1e2e6;
+
+            --md-sys-color-outline: #74777f;
+            --md-sys-color-outline-variant: #c4c6d0;
+
+            --md-sys-color-success: #1b6d31;
+            --md-sys-color-on-success: #ffffff;
+            --md-sys-color-success-container: #d4edda;
+            --md-sys-color-on-success-container: #155724;
+
+            --md-sys-color-warning: #944a00;
+            --md-sys-color-on-warning: #ffffff;
+            --md-sys-color-warning-container: #ffeeba;
+            --md-sys-color-on-warning-container: #856404;
+
+            --md-elevation-1: 0px 1px 3px 1px rgba(0, 0, 0, 0.08), 0px 1px 2px 0px rgba(0, 0, 0, 0.12);
+            --md-elevation-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.08), 0px 1px 2px 0px rgba(0, 0, 0, 0.14);
+            --md-elevation-3: 0px 4px 12px 3px rgba(0, 0, 0, 0.10), 0px 1px 4px 0px rgba(0, 0, 0, 0.16);
+        }
+
+        /* ==========================================================================
+           Base Styles & Layout
+           ========================================================================== */
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, Helvetica, sans-serif;
-            background-color: #f0f2f5;
-            color: #333333;
+            font-family: var(--app-font-family);
+            background-color: var(--md-sys-color-background);
+            color: var(--md-sys-color-on-background);
             margin: 0;
-            padding: 20px;
+            padding: 24px 16px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            line-height: 1.5;
         }
 
         .container {
-            max-width: 1140px;
+            max-width: 1200px;
             margin: 0 auto;
-            background-color: #ffffff;
-            padding: 25px;
-            border: 1px solid #dcdcdc;
-            border-radius: 6px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+            background-color: var(--md-sys-color-surface);
+            padding: 28px;
+            border: 1px solid var(--md-sys-color-outline-variant);
+            border-radius: 16px;
+            box-shadow: var(--md-elevation-2);
+            transition: background-color 0.3s ease, border-color 0.3s ease;
         }
 
+        /* ==========================================================================
+           Header & Top Actions
+           ========================================================================== */
         header {
-            text-align: center;
-            border-bottom: 2px solid #0056b3;
-            padding-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--md-sys-color-primary);
+            padding-bottom: 20px;
             margin-bottom: 20px;
-            position: relative;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header-branding {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .header-logo-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-logo-icon {
+            font-size: 28px;
         }
 
         h1 {
-            color: #0056b3;
+            color: var(--md-sys-color-primary);
             font-size: 26px;
-            margin-bottom: 5px;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
         }
 
         .subtitle {
-            color: #666;
-            font-size: 14px;
+            color: var(--md-sys-color-outline);
+            font-size: 13px;
             margin: 0;
         }
 
         .header-actions {
-            position: absolute;
-            right: 0;
-            top: 10px;
             display: flex;
             gap: 8px;
             align-items: center;
+            flex-wrap: wrap;
         }
 
-        .refresh-btn {
-            background-color: #6c757d;
+        /* ==========================================================================
+           Material 3 Segmented Navigation Bar
+           ========================================================================== */
+        .m3-nav-container {
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            overflow: visible;
         }
 
-        .refresh-btn:hover {
-            background-color: #5a6268;
+        .m3-segmented-nav {
+            display: flex;
+            background-color: var(--md-sys-color-surface-container-high);
+            padding: 6px;
+            border-radius: 9999px;
+            gap: 6px;
+            box-shadow: var(--md-elevation-1);
+            overflow: visible;
+            max-width: 100%;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .m3-segmented-nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-tab-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: 9999px;
+            border: 1px solid transparent;
+            background-color: transparent;
+            color: var(--md-sys-color-on-surface);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+            box-shadow: none;
+            box-sizing: border-box;
+            transform: none !important;
+        }
+
+        .nav-tab-btn .tab-icon {
+            font-size: 16px;
+        }
+
+        .nav-tab-btn:hover:not(.active):not(.tab-alert-blink) {
+            background-color: var(--md-sys-color-surface-container-highest);
+            color: var(--md-sys-color-primary);
+        }
+
+        .nav-tab-btn.active {
+            background-color: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
+            box-shadow: var(--md-elevation-1);
+            border-color: var(--md-sys-color-primary);
+        }
+
+        .tab-badge {
+            display: none !important;
+        }
+
+        /* ==========================================================================
+           Section Views (Single Section Rendering)
+           ========================================================================== */
+        .section-view {
+            display: none;
+            animation: fadeInSection 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .section-view.active {
+            display: block;
+        }
+
+        @keyframes fadeInSection {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Alert Notification Banner */
         #alertBanner {
             display: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            margin-bottom: 18px;
+            padding: 12px 18px;
+            border-radius: 12px;
+            margin-bottom: 20px;
             font-size: 14px;
             font-weight: 500;
+            box-shadow: var(--md-elevation-1);
         }
 
         .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+            background-color: var(--md-sys-color-success-container);
+            color: var(--md-sys-color-on-success-container);
+            border: 1px solid var(--md-sys-color-success);
         }
 
         .alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+            background-color: var(--md-sys-color-error-container);
+            color: var(--md-sys-color-on-error-container);
+            border: 1px solid var(--md-sys-color-error);
         }
 
-        /* Summary Metric Cards */
+        /* ==========================================================================
+           Summary Metric Cards (M3 Elevated Containers)
+           ========================================================================== */
         .report-cards {
             display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
+            gap: 16px;
+            margin-bottom: 24px;
             flex-wrap: wrap;
         }
 
         .report-card {
             flex: 1;
             min-width: 220px;
-            background-color: #fbfbfb;
-            border: 1px solid #ccd0d5;
-            border-radius: 5px;
-            padding: 14px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            background-color: var(--md-sys-color-surface-container-low);
+            border: 1px solid var(--md-sys-color-outline-variant);
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: var(--md-elevation-1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .report-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--md-elevation-2);
         }
 
         .report-card h3 {
             margin-top: 0;
-            font-size: 13px;
-            color: #555;
+            font-size: 12px;
+            color: var(--md-sys-color-outline);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 1px dashed #ccc;
-            padding-bottom: 5px;
-            margin-bottom: 8px;
+            letter-spacing: 0.8px;
+            border-bottom: 1px dashed var(--md-sys-color-outline-variant);
+            padding-bottom: 6px;
+            margin-bottom: 10px;
         }
 
         .report-card .metric-val {
-            font-size: 24px;
-            font-weight: bold;
-            color: #0056b3;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--md-sys-color-primary);
         }
 
         .report-card .metric-sub {
             font-size: 12px;
-            color: #777;
-            margin-top: 4px;
+            color: var(--md-sys-color-outline);
+            margin-top: 6px;
         }
 
-        /* Section Boxes */
-        .section-box {
-            background-color: #fafafa;
-            border: 1px solid #e1e4e8;
-            border-radius: 5px;
-            padding: 18px;
-            margin-bottom: 25px;
-        }
-
-        h2 {
-            font-size: 18px;
-            color: #2c3e50;
-            margin-top: 0;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 6px;
+        /* Quick System Action Card on Dashboard */
+        .quick-actions-bar {
+            background-color: var(--md-sys-color-surface-container-low);
+            border: 1px solid var(--md-sys-color-outline-variant);
+            border-radius: 16px;
+            padding: 18px 22px;
+            margin-bottom: 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+        .quick-actions-bar h3 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--md-sys-color-on-surface);
+        }
+
+        .quick-actions-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Dashboard Status Grid */
+        .status-overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .status-tile {
+            background-color: var(--md-sys-color-surface-container-lowest);
+            border: 1px solid var(--md-sys-color-outline-variant);
+            border-radius: 16px;
+            padding: 14px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: var(--md-elevation-1);
+        }
+
+        .status-tile:hover {
+            transform: translateY(-2px);
+            border-color: var(--md-sys-color-primary);
+            box-shadow: var(--md-elevation-2);
+        }
+
+        .status-tile-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            color: var(--md-sys-color-outline);
+            margin-bottom: 4px;
+        }
+
+        .status-tile-count {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        /* ==========================================================================
+           Section Boxes & Cards (16px border-radius)
+           ========================================================================== */
+        .section-box {
+            background-color: var(--md-sys-color-surface-container-low);
+            border: 1px solid var(--md-sys-color-outline-variant);
+            border-radius: 16px;
+            padding: 22px;
+            margin-bottom: 24px;
+            box-shadow: var(--md-elevation-1);
+        }
+
+        h2 {
+            font-size: 19px;
+            font-weight: 600;
+            color: var(--md-sys-color-on-surface);
+            margin-top: 0;
+            border-bottom: 1px solid var(--md-sys-color-outline-variant);
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .info-note {
-            font-size: 12px;
-            color: #555;
-            background-color: #e8f4fd;
-            border-left: 3px solid #007bff;
-            padding: 8px 12px;
-            margin-bottom: 14px;
-            border-radius: 2px;
+            font-size: 13px;
+            color: var(--md-sys-color-on-surface);
+            background-color: var(--md-sys-color-primary-container);
+            border-left: 4px solid var(--md-sys-color-primary);
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            border-radius: 8px;
+            line-height: 1.5;
         }
 
-        /* Forms */
+        /* ==========================================================================
+           Forms & Inputs
+           ========================================================================== */
         .form-row {
             display: flex;
             flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 12px;
+            gap: 14px;
+            margin-bottom: 16px;
             align-items: flex-end;
         }
 
@@ -167,143 +586,226 @@
             display: flex;
             flex-direction: column;
             flex: 1;
-            min-width: 150px;
+            min-width: 160px;
         }
 
         label {
             font-size: 13px;
-            font-weight: bold;
-            margin-bottom: 4px;
-            color: #444;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--md-sys-color-on-surface);
         }
 
         input,
         select,
         textarea {
-            padding: 7px 10px;
+            padding: 9px 12px;
             font-size: 14px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background-color: #fff;
+            font-family: inherit;
+            border: 1px solid var(--md-sys-color-outline-variant);
+            border-radius: 8px;
+            background-color: var(--md-sys-color-surface-container-lowest);
+            color: var(--md-sys-color-on-surface);
             box-sizing: border-box;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
         input:focus,
         select:focus,
         textarea:focus {
             outline: none;
-            border-color: #0066cc;
-            box-shadow: 0 0 3px rgba(0, 102, 204, 0.3);
+            border-color: var(--md-sys-color-primary);
+            box-shadow: 0 0 0 3px var(--md-sys-color-primary-container);
         }
 
-        button {
-            padding: 8px 14px;
+        /* ==========================================================================
+           Buttons & Micro-Interactions (Hover Left-to-Right + Click Scale)
+           ========================================================================== */
+        button,
+        .btn {
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+            padding: 9px 18px;
             font-size: 13px;
-            font-weight: bold;
-            color: #fff;
-            background-color: #0066cc;
+            font-weight: 600;
+            font-family: inherit;
+            color: #ffffff;
+            background-color: var(--md-sys-color-primary);
             border: none;
-            border-radius: 4px;
+            border-radius: 9999px;
             cursor: pointer;
-            transition: background 0.15s, transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            line-height: 1.4;
+            user-select: none;
+            text-decoration: none;
+            transition: transform 0.12s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+            box-shadow: var(--md-elevation-1);
         }
 
-        button:hover {
-            background-color: #004d99;
+        /* Hover: Turns black sliding smoothly from left to right */
+        button::before,
+        .btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+            opacity: 0.88;
+            transition: left 0.42s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.15s ease;
+            z-index: -1;
+            pointer-events: none;
         }
 
-        /* Button Colors */
+        button:hover::before,
+        .btn:hover::before {
+            left: 0;
+        }
+
+        /* Click (:active): Overlay hides (opacity: 0) and button snaps to deep saturated shade with scale(0.96) */
+        button:active,
+        .btn:active {
+            transform: scale(0.96);
+            box-shadow: none;
+        }
+
+        button:active::before,
+        .btn:active::before {
+            opacity: 0 !important;
+        }
+
+        /* Prevent black hover overlay from obscuring navigation tabs and pagination controls */
+        .nav-tab-btn::before,
+        .page-btn::before {
+            display: none !important;
+        }
+
+        .nav-tab-btn:active {
+            transform: scale(0.97);
+        }
+
+        /* Button Native Colors and Deep Saturated :active Shades */
         .btn-green {
             background-color: #28a745;
         }
+        .btn-green:active {
+            background-color: #1b5e20 !important;
+        }
 
-        .btn-green:hover {
-            background-color: #218838;
+        .btn-blue,
+        .btn-primary {
+            background-color: #0056b3;
+        }
+        .btn-blue:active,
+        .btn-primary:active {
+            background-color: #003e75 !important;
         }
 
         .btn-orange {
             background-color: #fd7e14;
         }
-
-        .btn-orange:hover {
-            background-color: #e36a05;
+        .btn-orange:active {
+            background-color: #b23c00 !important;
         }
 
         .btn-purple {
             background-color: #6f42c1;
         }
-
-        .btn-purple:hover {
-            background-color: #5a32a3;
+        .btn-purple:active {
+            background-color: #4a148c !important;
         }
 
         .btn-red {
             background-color: #dc3545;
         }
-
-        .btn-red:hover {
-            background-color: #bd2130;
+        .btn-red:active {
+            background-color: #8e0000 !important;
         }
 
         .btn-teal {
             background-color: #17a2b8;
         }
+        .btn-teal:active {
+            background-color: #004d40 !important;
+        }
 
-        .btn-teal:hover {
-            background-color: #117a8b;
+        .btn-gray,
+        .refresh-btn {
+            background-color: #6c757d;
+        }
+        .btn-gray:active,
+        .refresh-btn:active {
+            background-color: #202124 !important;
+        }
+
+        button:not([class*="btn-"]):active {
+            background-color: #003e75 !important;
         }
 
         .btn-sm {
-            padding: 4px 8px;
+            padding: 5px 12px;
             font-size: 12px;
             margin-right: 4px;
             margin-bottom: 4px;
+            border-radius: 9999px;
         }
 
-        /* Tables */
+        /* ==========================================================================
+           Tables
+           ========================================================================== */
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 12px;
+            margin-top: 14px;
             font-size: 13px;
-            background-color: #ffffff;
+            background-color: var(--md-sys-color-surface-container-lowest);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--md-sys-color-outline-variant);
         }
 
-        table,
         th,
         td {
-            border: 1px solid #dddddd;
-        }
-
-        th {
-            background-color: #eef2f7;
-            color: #333;
-            text-align: left;
-            padding: 9px;
-            font-weight: bold;
-        }
-
-        td {
-            padding: 9px;
+            border: 1px solid var(--md-sys-color-outline-variant);
+            padding: 11px 12px;
             vertical-align: middle;
         }
 
+        th {
+            background-color: var(--md-sys-color-surface-container-high);
+            color: var(--md-sys-color-on-surface);
+            text-align: left;
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
         tr:nth-child(even) {
-            background-color: #f9f9f9;
+            background-color: var(--md-sys-color-surface-container-low);
         }
 
         tr:hover {
-            background-color: #f1f5f9;
+            background-color: var(--md-sys-color-surface-container-highest);
         }
 
-        /* Status Badges */
+        /* ==========================================================================
+           Status Badges (Pill 9999px)
+           ========================================================================== */
         .badge {
             display: inline-block;
-            padding: 3px 8px;
-            border-radius: 12px;
+            padding: 4px 10px;
+            border-radius: 9999px;
             font-size: 11px;
-            font-weight: bold;
+            font-weight: 700;
             text-transform: uppercase;
+            letter-spacing: 0.4px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.06);
         }
 
         .badge-ready {
@@ -343,117 +845,151 @@
         }
 
         .badge-priority-high {
-            background-color: #ff3333;
-            color: #fff;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: bold;
+            background-color: #dc3545;
+            color: #ffffff;
+            padding: 3px 8px;
+            border-radius: 9999px;
+            font-weight: 700;
             font-size: 10px;
+            letter-spacing: 0.5px;
         }
 
         .badge-priority-normal {
             background-color: #6c757d;
-            color: #fff;
-            padding: 2px 6px;
-            border-radius: 4px;
+            color: #ffffff;
+            padding: 3px 8px;
+            border-radius: 9999px;
             font-size: 10px;
         }
 
         .badge-action {
-            background-color: #eef2f7;
-            color: #0056b3;
-            border: 1px solid #b8daff;
-            font-size: 10px;
-            padding: 2px 6px;
-            border-radius: 3px;
+            background-color: var(--md-sys-color-surface-container-high);
+            color: var(--md-sys-color-primary);
+            border: 1px solid var(--md-sys-color-outline-variant);
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 6px;
             font-family: monospace;
-            font-weight: bold;
+            font-weight: 700;
         }
 
-        /* Pagination Styles */
+        /* ==========================================================================
+           Pagination Controls & Inline Page Size Selector
+           ========================================================================== */
         .pagination-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 12px;
-            padding-top: 8px;
-            border-top: 1px solid #e1e4e8;
-            font-size: 12px;
-            color: #555;
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px solid var(--md-sys-color-outline-variant);
+            font-size: 13px;
+            color: var(--md-sys-color-outline);
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 12px;
+        }
+
+        .pagination-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .page-size-selector {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--md-sys-color-on-surface);
+        }
+
+        .page-size-select {
+            padding: 4px 8px;
+            font-size: 12px;
+            border-radius: 6px;
+            border: 1px solid var(--md-sys-color-outline-variant);
+            background-color: var(--md-sys-color-surface-container-lowest);
+            color: var(--md-sys-color-on-surface);
+            cursor: pointer;
         }
 
         .pagination-nav {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 5px;
         }
 
         .page-btn {
-            background-color: #fff;
-            color: #0056b3;
-            border: 1px solid #ccd0d5;
-            padding: 4px 10px;
+            background-color: var(--md-sys-color-surface-container-highest);
+            color: var(--md-sys-color-on-surface);
+            border: 1px solid var(--md-sys-color-outline-variant);
+            padding: 5px 12px;
             font-size: 12px;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.15s ease-in-out;
-            min-width: 30px;
+            min-width: 32px;
             text-align: center;
+            box-shadow: none;
+            overflow: visible !important;
         }
 
         .page-btn:hover:not(:disabled) {
-            background-color: #e9ecef;
-            border-color: #0056b3;
+            background-color: #000000;
+            color: #ffffff;
+            border-color: #000000;
         }
 
         .page-btn.active {
-            background-color: #0056b3;
-            color: #ffffff;
-            border-color: #004085;
-            font-weight: bold;
+            background-color: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
+            border-color: var(--md-sys-color-primary);
+            font-weight: 700;
         }
 
         .page-btn:disabled {
-            color: #aaa;
-            border-color: #e1e4e8;
+            color: var(--md-sys-color-outline-variant);
+            border-color: var(--md-sys-color-outline-variant);
             cursor: not-allowed;
-            background-color: #f8f9fa;
+            background-color: var(--md-sys-color-surface-container-low);
+            opacity: 0.6;
         }
 
-        /* Blinking Page Number Alert Keyframe (Red-Amber Alert Pulse) */
-        @keyframes alertBlinkRedAmber {
-            0% {
-                background-color: #dc3545;
-                color: #ffffff;
-                border-color: #bd2130;
-                box-shadow: 0 0 10px rgba(220, 53, 69, 0.9), 0 0 4px rgba(220, 53, 69, 0.6);
-                transform: scale(1.04);
+        /* ==========================================================================
+           Blinking Alert Keyframe Animation (Gentle Slow Yellow Pulse)
+           NO scale / NO transform / NO wave-float / Zero Layout Shift
+           ========================================================================== */
+        @keyframes alertBlinkYellowSlow {
+            0%, 100% {
+                background-color: transparent;
+                color: var(--md-sys-color-on-surface);
+                border-color: transparent;
+                box-shadow: none;
             }
 
             50% {
-                background-color: #ff9800;
-                color: #212529;
-                border-color: #e65100;
-                box-shadow: 0 0 16px rgba(255, 152, 0, 0.95), 0 0 6px rgba(255, 152, 0, 0.7);
-                transform: scale(1.12);
-            }
-
-            100% {
-                background-color: #dc3545;
-                color: #ffffff;
-                border-color: #bd2130;
-                box-shadow: 0 0 10px rgba(220, 53, 69, 0.9), 0 0 4px rgba(220, 53, 69, 0.6);
-                transform: scale(1.04);
+                background-color: #ffc107;
+                color: #000000;
+                border-color: #ff9800;
+                box-shadow: 0 0 16px rgba(255, 193, 7, 0.9), 0 0 6px rgba(255, 193, 7, 0.7);
             }
         }
 
+        .nav-tab-btn.tab-alert-blink,
+        .tab-alert-blink {
+            animation: alertBlinkYellowSlow 1.8s infinite ease-in-out !important;
+            font-weight: 700 !important;
+            position: relative;
+            transform: none !important;
+            opacity: 1 !important;
+        }
+
         .page-btn.page-alert-blink {
-            animation: alertBlinkRedAmber 1s infinite alternate ease-in-out !important;
+            animation: alertBlinkYellowSlow 1.8s infinite ease-in-out !important;
             font-weight: bold !important;
             position: relative;
-            z-index: 2;
+            transform: none !important;
         }
 
         .page-btn.page-alert-blink::after {
@@ -462,10 +998,12 @@
             top: -7px;
             right: -2px;
             font-size: 16px;
-            color: #ffff00;
+            color: #ffc107;
         }
 
-        /* Modals */
+        /* ==========================================================================
+           Modals (Inspection & Download)
+           ========================================================================== */
         .modal {
             display: none;
             position: fixed;
@@ -474,60 +1012,63 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.6);
             align-items: center;
             justify-content: center;
+            backdrop-filter: blur(3px);
         }
 
         .modal-content {
-            background-color: #fff;
-            padding: 22px;
-            border-radius: 6px;
+            background-color: var(--md-sys-color-surface);
+            color: var(--md-sys-color-on-surface);
+            padding: 26px;
+            border-radius: 16px;
             width: 90%;
-            max-width: 480px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            max-width: 490px;
+            box-shadow: var(--md-elevation-3);
+            border: 1px solid var(--md-sys-color-outline-variant);
         }
 
         .modal-header {
-            font-size: 16px;
-            font-weight: bold;
-            color: #0056b3;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 8px;
-            margin-bottom: 14px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--md-sys-color-primary);
+            border-bottom: 1px solid var(--md-sys-color-outline-variant);
+            padding-bottom: 10px;
+            margin-bottom: 16px;
         }
 
         .modal-actions {
             display: flex;
             justify-content: flex-end;
             gap: 10px;
-            margin-top: 15px;
+            margin-top: 18px;
         }
 
         .format-card {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 12px;
-            border: 1px solid #ccd0d5;
-            border-radius: 5px;
-            background-color: #fafafa;
+            padding: 14px;
+            border: 1px solid var(--md-sys-color-outline-variant);
+            border-radius: 12px;
+            background-color: var(--md-sys-color-surface-container-low);
             cursor: pointer;
             transition: border-color 0.15s, background-color 0.15s;
         }
 
         .format-card:hover {
-            border-color: #0066cc;
-            background-color: #f0f7ff;
+            border-color: var(--md-sys-color-primary);
+            background-color: var(--md-sys-color-primary-container);
         }
 
         footer {
             text-align: center;
             font-size: 12px;
-            color: #777;
-            margin-top: 25px;
-            border-top: 1px solid #eee;
-            padding-top: 10px;
+            color: var(--md-sys-color-outline);
+            margin-top: 30px;
+            border-top: 1px solid var(--md-sys-color-outline-variant);
+            padding-top: 14px;
         }
     </style>
 </head>
@@ -535,12 +1076,21 @@
 <body>
 
     <div class="container">
+        <!-- Portal Header -->
         <header>
-            <h1>HouseKeepTrack</h1>
-            <p class="subtitle">Hotel Room Lifecycle & Automated Housekeeping Management Portal</p>
+            <div class="header-branding">
+                <div class="header-logo-row">
+                    <span class="header-logo-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16M9 9h1M9 13h1M9 17h1M14 9h1M14 13h1M14 17h1"/></svg>
+                    </span>
+                    <h1>HouseKeepTrack</h1>
+                </div>
+                <p class="subtitle">Hotel Room Lifecycle & Automated Housekeeping Management Portal</p>
+            </div>
             <div class="header-actions">
+                <button class="btn-sm btn-teal" id="themeToggleBtn" onclick="cycleTheme()" title="Toggle Auto / Light / Dark Theme">Theme: Auto</button>
                 <button class="btn-sm btn-orange" onclick="revertLastAction()" title="Revert the most recent operational action">&#x21ba; Revert Last Action</button>
-                <button class="btn-sm btn-purple" onclick="openDownloadModal()"> Download Audit Logs</button>
+                <button class="btn-sm btn-purple" onclick="openDownloadModal()">&#x2913; Download Audit Logs</button>
                 <button class="refresh-btn btn-sm" onclick="refreshAll()">&#x21bb; Refresh Data</button>
             </div>
         </header>
@@ -548,284 +1098,453 @@
         <!-- Global Feedback Alert Banner -->
         <div id="alertBanner"></div>
 
-        <!-- 1. System Overview Metrics Cards -->
-        <div class="report-cards">
-            <div class="report-card">
-                <h3>Total Rooms</h3>
-                <div class="metric-val" id="metricTotalRooms">-</div>
-                <div class="metric-sub" id="metricRoomBreakdown">Loading room states...</div>
+        <!-- Material 3 Segmented Navigation Bar -->
+        <nav class="m3-nav-container" aria-label="Portal Navigation Tabs">
+            <div class="m3-segmented-nav">
+                <button class="nav-tab-btn active" data-tab="dashboard" onclick="switchTab('dashboard')">
+                    <span class="tab-icon">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+                    </span>
+                    <span class="tab-label">Dashboard</span>
+                </button>
+                <button class="nav-tab-btn" data-tab="rooms" onclick="switchTab('rooms')">
+                    <span class="tab-icon">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16M2 8h18a2 2 0 0 1 2 2v10M2 17h20M6 8v9"/></svg>
+                    </span>
+                    <span class="tab-label">Rooms</span>
+                </button>
+                <button class="nav-tab-btn" data-tab="tasks" onclick="switchTab('tasks')">
+                    <span class="tab-icon">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                    </span>
+                    <span class="tab-label">Cleaning Tasks</span>
+                </button>
+                <button class="nav-tab-btn" data-tab="staff" onclick="switchTab('staff')">
+                    <span class="tab-icon">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </span>
+                    <span class="tab-label">Housekeepers</span>
+                </button>
+                <button class="nav-tab-btn" data-tab="inspections" onclick="switchTab('inspections')">
+                    <span class="tab-icon">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    </span>
+                    <span class="tab-label">Inspections</span>
+                </button>
+                <button class="nav-tab-btn" data-tab="audit" onclick="switchTab('audit')">
+                    <span class="tab-icon">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    </span>
+                    <span class="tab-label">Audit Trail</span>
+                </button>
             </div>
-            <div class="report-card">
-                <h3>Housekeepers</h3>
-                <div class="metric-val" id="metricTotalStaff">-</div>
-                <div class="metric-sub" id="metricStaffAvailable">- Available</div>
-            </div>
-            <div class="report-card">
-                <h3>Cleaning Tasks</h3>
-                <div class="metric-val" id="metricCompletedTasks">-</div>
-                <div class="metric-sub" id="metricPendingTasks">- In queue / active</div>
-            </div>
-            <div class="report-card">
-                <h3>Avg Room Turnaround</h3>
-                <div class="metric-val" id="metricAvgTurnaround">-</div>
-                <div class="metric-sub">Dirty to Ready cycle</div>
-            </div>
-        </div>
+        </nav>
 
-        <!-- 2. Room Lifecycle Management -->
-        <div class="section-box">
-            <h2>1. Hotel Rooms & Lifecycle Status</h2>
-            <div class="info-note">
-                <strong>Strict Lifecycle Flow:</strong> OCCUPIED &rarr; DIRTY (checkout) &rarr; IN_CLEANING &rarr;
-                CLEANED &rarr; INSPECTED &rarr; READY &rarr; OCCUPIED.
-                <br><em>* Rooms cannot be checked in unless status is strictly <strong>READY</strong>. Failed
-                    inspections revert room to <strong>DIRTY</strong> with HIGH-priority re-cleaning.</em>
-            </div>
-
-            <form id="addRoomForm" onsubmit="createRoom(event)">
-                <div class="form-row">
-                    <div class="form-group" style="max-width: 180px;">
-                        <label>Room Number:</label>
-                        <input type="text" id="newRoomNumber" placeholder="e.g. 101" required>
-                    </div>
-                    <div class="form-group" style="max-width: 200px;">
-                        <label>Room Type:</label>
-                        <select id="newRoomType">
-                            <option value="STANDARD">STANDARD</option>
-                            <option value="DELUXE" selected>DELUXE</option>
-                            <option value="SUITE">SUITE</option>
-                            <option value="EXECUTIVE">EXECUTIVE</option>
-                        </select>
-                    </div>
-                    <div class="form-group" style="flex: 0; min-width: 140px;">
-                        <button type="submit" class="btn-green">+ Add Room</button>
-                    </div>
+        <!-- ==========================================================================
+             SECTION 1: DASHBOARD
+             ========================================================================== -->
+        <div class="section-view active" id="view-dashboard">
+            <!-- 1. System Overview Metrics Cards -->
+            <div class="report-cards">
+                <div class="report-card">
+                    <h3>Total Rooms</h3>
+                    <div class="metric-val" id="metricTotalRooms">-</div>
+                    <div class="metric-sub" id="metricRoomBreakdown">Loading room states...</div>
                 </div>
-            </form>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width: 50px;">ID</th>
-                        <th style="width: 100px;">Room #</th>
-                        <th style="width: 110px;">Type</th>
-                        <th style="width: 130px;">Status</th>
-                        <th>Timeline Details</th>
-                        <th style="width: 310px;">Lifecycle Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="roomsTableBody">
-                    <tr>
-                        <td colspan="6" style="text-align:center;">Loading rooms...</td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="pagination-container" id="roomsPagination">
-                <span class="pagination-info" id="roomsPageInfo">Showing 0-0 of 0 rooms</span>
-                <div class="pagination-nav">
-                    <button class="page-btn" id="roomsPrevBtn" onclick="changeRoomsPage(-1)">« Prev</button>
-                    <span id="roomsPageNumbers" class="pagination-nav"></span>
-                    <button class="page-btn" id="roomsNextBtn" onclick="changeRoomsPage(1)">Next »</button>
+                <div class="report-card">
+                    <h3>Housekeepers</h3>
+                    <div class="metric-val" id="metricTotalStaff">-</div>
+                    <div class="metric-sub" id="metricStaffAvailable">- Available</div>
+                </div>
+                <div class="report-card">
+                    <h3>Cleaning Tasks</h3>
+                    <div class="metric-val" id="metricCompletedTasks">-</div>
+                    <div class="metric-sub" id="metricPendingTasks">- In queue / active</div>
+                </div>
+                <div class="report-card">
+                    <h3>Avg Room Turnaround</h3>
+                    <div class="metric-val" id="metricAvgTurnaround">-</div>
+                    <div class="metric-sub">Dirty to Ready cycle</div>
                 </div>
             </div>
-        </div>
 
-        <!-- 3. Active Cleaning Tasks & Priority Queue -->
-        <div class="section-box">
-            <h2>
-                <span>2. Cleaning Tasks & Auto-Assignment Priority Queue</span>
-                <button class="btn-sm btn-teal" onclick="triggerQueueDispatch()">&#9654; Force Queue Dispatch</button>
-            </h2>
-            <div class="info-note">
-                <strong>Dual High-Priority Rules:</strong> (1) Inspection-failed rooms receive <strong>HIGH</strong>
-                priority. (2) Longest-waiting dirty rooms dynamically escalate to <strong>HIGH</strong> priority.
-                Available workers pick HIGH priority tasks before normal checkout tasks.
-            </div>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width: 60px;">Task ID</th>
-                        <th style="width: 90px;">Room #</th>
-                        <th style="width: 90px;">Priority</th>
-                        <th style="width: 120px;">Task Status</th>
-                        <th style="width: 160px;">Assigned Worker</th>
-                        <th>Notes / Defect Remarks</th>
-                        <th style="width: 130px;">Action</th>
-                    </tr>
-                </thead>
-                <tbody id="tasksTableBody">
-                    <tr>
-                        <td colspan="7" style="text-align:center;">Loading cleaning tasks...</td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="pagination-container" id="tasksPagination">
-                <span class="pagination-info" id="tasksPageInfo">Showing 0-0 of 0 tasks</span>
-                <div class="pagination-nav">
-                    <button class="page-btn" id="tasksPrevBtn" onclick="changeTasksPage(-1)">« Prev</button>
-                    <span id="tasksPageNumbers" class="pagination-nav"></span>
-                    <button class="page-btn" id="tasksNextBtn" onclick="changeTasksPage(1)">Next »</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- 4. Housekeeping Staff & Workload -->
-        <div class="section-box">
-            <h2>3. Housekeeping Staff & Workload Monitoring</h2>
-            <form id="addStaffForm" onsubmit="createHousekeeper(event)">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Staff Name:</label>
-                        <input type="text" id="staffName" placeholder="e.g. Alice Smith" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Email Address:</label>
-                        <input type="email" id="staffEmail" placeholder="e.g. alice@hotel.com" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Phone:</label>
-                        <input type="text" id="staffPhone" placeholder="e.g. 555-0199">
-                    </div>
-                    <div class="form-group" style="flex: 0; min-width: 150px;">
-                        <button type="submit">+ Register Staff</button>
+            <!-- Quick System Actions Bar -->
+            <div class="quick-actions-bar">
+                <div>
+                    <h3>Quick System Actions</h3>
+                    <div style="font-size: 12px; color: var(--md-sys-color-outline); margin-top: 2px;">
+                        Manage priority dispatch, system rollbacks, and exports at a glance
                     </div>
                 </div>
-            </form>
+                <div class="quick-actions-buttons">
+                    <button class="btn-sm btn-teal" onclick="triggerQueueDispatch()">&#9654; Force Queue Dispatch</button>
+                    <button class="btn-sm btn-orange" onclick="revertLastAction()">&#x21ba; Revert Last Action</button>
+                    <button class="btn-sm btn-purple" onclick="openDownloadModal()">&#x2913; Download Audit Logs</button>
+                    <button class="btn-sm refresh-btn" onclick="refreshAll()">&#x21bb; Refresh Data</button>
+                </div>
+            </div>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width: 50px;">ID</th>
-                        <th>Name</th>
-                        <th>Email / Phone</th>
-                        <th style="width: 110px;">Status</th>
-                        <th style="width: 110px;">Active Tasks</th>
-                        <th style="width: 120px;">Completed Tasks</th>
-                        <th style="width: 140px;">Avg Turnaround</th>
-                        <th style="width: 220px;">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="staffTableBody">
-                    <tr>
-                        <td colspan="8" style="text-align:center;">Loading housekeeping staff...</td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="pagination-container" id="staffPagination">
-                <span class="pagination-info" id="staffPageInfo">Showing 0-0 of 0 staff</span>
-                <div class="pagination-nav">
-                    <button class="page-btn" id="staffPrevBtn" onclick="changeStaffPage(-1)">« Prev</button>
-                    <span id="staffPageNumbers" class="pagination-nav"></span>
-                    <button class="page-btn" id="staffNextBtn" onclick="changeStaffPage(1)">Next »</button>
+            <!-- Room Status Distribution Quick Tiles -->
+            <div class="section-box">
+                <h2>
+                    <span>Hotel Room State Distribution</span>
+                    <button class="btn-sm btn-blue" onclick="switchTab('rooms')">Go to Rooms &rarr;</button>
+                </h2>
+                <div class="status-overview-grid" id="statusTilesContainer">
+                    <div class="status-tile" onclick="switchTab('rooms')">
+                        <div class="status-tile-title">READY</div>
+                        <div class="status-tile-count" id="tileCountReady" style="color: #28a745;">0</div>
+                    </div>
+                    <div class="status-tile" onclick="switchTab('rooms')">
+                        <div class="status-tile-title">OCCUPIED</div>
+                        <div class="status-tile-count" id="tileCountOccupied" style="color: #0056b3;">0</div>
+                    </div>
+                    <div class="status-tile" onclick="switchTab('rooms')">
+                        <div class="status-tile-title">DIRTY (Awaiting Clean)</div>
+                        <div class="status-tile-count" id="tileCountDirty" style="color: #dc3545;">0</div>
+                    </div>
+                    <div class="status-tile" onclick="switchTab('rooms')">
+                        <div class="status-tile-title">IN_CLEANING</div>
+                        <div class="status-tile-count" id="tileCountInCleaning" style="color: #fd7e14;">0</div>
+                    </div>
+                    <div class="status-tile" onclick="switchTab('rooms')">
+                        <div class="status-tile-title">CLEANED (Need Insp)</div>
+                        <div class="status-tile-count" id="tileCountCleaned" style="color: #6f42c1;">0</div>
+                    </div>
+                    <div class="status-tile" onclick="switchTab('rooms')">
+                        <div class="status-tile-title">INSPECTED</div>
+                        <div class="status-tile-count" id="tileCountInspected" style="color: #17a2b8;">0</div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- 5. Supervisor Inspection Log -->
-        <div class="section-box">
-            <h2>4. Supervisor Inspection History</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width: 60px;">Insp ID</th>
-                        <th style="width: 90px;">Room #</th>
-                        <th style="width: 140px;">Supervisor</th>
-                        <th style="width: 110px;">Result</th>
-                        <th>Feedback / Failure Comments</th>
-                        <th style="width: 160px;">Inspected At</th>
-                    </tr>
-                </thead>
-                <tbody id="inspectionsTableBody">
-                    <tr>
-                        <td colspan="6" style="text-align:center;">Loading inspections...</td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="pagination-container" id="inspectionsPagination">
-                <span class="pagination-info" id="inspectionsPageInfo">Showing 0-0 of 0 inspections</span>
-                <div class="pagination-nav">
-                    <button class="page-btn" id="inspectionsPrevBtn" onclick="changeInspectionsPage(-1)">« Prev</button>
-                    <span id="inspectionsPageNumbers" class="pagination-nav"></span>
-                    <button class="page-btn" id="inspectionsNextBtn" onclick="changeInspectionsPage(1)">Next »</button>
+        <!-- ==========================================================================
+             SECTION 2: ROOMS
+             ========================================================================== -->
+        <div class="section-view" id="view-rooms">
+            <div class="section-box">
+                <h2>1. Hotel Rooms & Lifecycle Status</h2>
+                <div class="info-note">
+                    <strong>Strict Lifecycle Flow:</strong> OCCUPIED &rarr; DIRTY (checkout) &rarr; IN_CLEANING &rarr;
+                    CLEANED &rarr; INSPECTED &rarr; READY &rarr; OCCUPIED.
+                    <br><em>* Rooms cannot be checked in unless status is strictly <strong>READY</strong>. Failed
+                        inspections revert room to <strong>DIRTY</strong> with HIGH-priority re-cleaning.</em>
+                </div>
+
+                <form id="addRoomForm" onsubmit="createRoom(event)">
+                    <div class="form-row">
+                        <div class="form-group" style="max-width: 180px;">
+                            <label>Room Number:</label>
+                            <input type="text" id="newRoomNumber" placeholder="e.g. 101" required>
+                        </div>
+                        <div class="form-group" style="max-width: 200px;">
+                            <label>Room Type:</label>
+                            <select id="newRoomType">
+                                <option value="STANDARD">STANDARD</option>
+                                <option value="DELUXE" selected>DELUXE</option>
+                                <option value="SUITE">SUITE</option>
+                                <option value="EXECUTIVE">EXECUTIVE</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="flex: 0; min-width: 140px;">
+                            <button type="submit" class="btn-green">+ Add Room</button>
+                        </div>
+                    </div>
+                </form>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">ID</th>
+                            <th style="width: 100px;">Room #</th>
+                            <th style="width: 110px;">Type</th>
+                            <th style="width: 130px;">Status</th>
+                            <th>Timeline Details</th>
+                            <th style="width: 310px;">Lifecycle Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="roomsTableBody">
+                        <tr>
+                            <td colspan="6" style="text-align:center;">Loading rooms...</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="pagination-container" id="roomsPagination">
+                    <div class="pagination-left">
+                        <span class="pagination-info" id="roomsPageInfo">Showing 0-0 of 0 rooms</span>
+                        <div class="page-size-selector">
+                            <label for="roomsPageSizeSelect">Show:</label>
+                            <select id="roomsPageSizeSelect" class="page-size-select" onchange="changePageSize('rooms', this.value)">
+                                <option value="5">5</option>
+                                <option value="10" selected>10</option>
+                                <option value="20">20</option>
+                            </select>
+                            <span>entries</span>
+                        </div>
+                    </div>
+                    <div class="pagination-nav">
+                        <button class="page-btn" id="roomsPrevBtn" onclick="changeRoomsPage(-1)">« Prev</button>
+                        <span id="roomsPageNumbers" class="pagination-nav"></span>
+                        <button class="page-btn" id="roomsNextBtn" onclick="changeRoomsPage(1)">Next »</button>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- 6. Operational Audit Trail -->
-        <div class="section-box">
-            <h2>
-                <span>5. Operational Audit Trail & Accountability Log</span>
-                <div style="display: flex; gap: 8px;">
-                    <button class="btn-sm btn-orange" onclick="revertLastAction()" title="Revert the most recent operational action">&#x21ba; Revert Last Action</button>
-                    <button class="btn-sm btn-purple" onclick="openDownloadModal()"> Download Audit Logs</button>
+        <!-- ==========================================================================
+             SECTION 3: CLEANING TASKS
+             ========================================================================== -->
+        <div class="section-view" id="view-tasks">
+            <div class="section-box">
+                <h2>
+                    <span>2. Cleaning Tasks & Auto-Assignment Priority Queue</span>
+                    <button class="btn-sm btn-teal" onclick="triggerQueueDispatch()">&#9654; Force Queue Dispatch</button>
+                </h2>
+                <div class="info-note">
+                    <strong>Dual High-Priority Rules:</strong> (1) Inspection-failed rooms receive <strong>HIGH</strong>
+                    priority. (2) Longest-waiting dirty rooms dynamically escalate to <strong>HIGH</strong> priority.
+                    Available workers pick HIGH priority tasks before normal checkout tasks.
                 </div>
-            </h2>
-            <div class="info-note">
-                <strong>Accountability & Change Tracking:</strong> Records chronological operational changes, actors,
-                entity targets,
-                and state events. Real-time updates alert you to changes on other pages.
-            </div>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width: 50px;">ID</th>
-                        <th style="width: 155px;">Timestamp</th>
-                        <th style="width: 150px;">Action</th>
-                        <th style="width: 120px;">Entity</th>
-                        <th style="width: 120px;">Actor</th>
-                        <th>Event Details</th>
-                        <th style="width: 90px;">Action</th>
-                    </tr>
-                </thead>
-                <tbody id="auditTableBody">
-                    <tr>
-                        <td colspan="7" style="text-align:center;">Loading audit trail...</td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="pagination-container" id="auditPagination">
-                <span class="pagination-info" id="auditPageInfo">Showing 0-0 of 0 audit logs</span>
-                <div class="pagination-nav">
-                    <button class="page-btn" id="auditPrevBtn" onclick="changeAuditPage(-1)">« Prev</button>
-                    <span id="auditPageNumbers" class="pagination-nav"></span>
-                    <button class="page-btn" id="auditNextBtn" onclick="changeAuditPage(1)">Next »</button>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">Task ID</th>
+                            <th style="width: 90px;">Room #</th>
+                            <th style="width: 90px;">Priority</th>
+                            <th style="width: 120px;">Task Status</th>
+                            <th style="width: 160px;">Assigned Worker</th>
+                            <th>Notes / Defect Remarks</th>
+                            <th style="width: 130px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tasksTableBody">
+                        <tr>
+                            <td colspan="7" style="text-align:center;">Loading cleaning tasks...</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="pagination-container" id="tasksPagination">
+                    <div class="pagination-left">
+                        <span class="pagination-info" id="tasksPageInfo">Showing 0-0 of 0 tasks</span>
+                        <div class="page-size-selector">
+                            <label for="tasksPageSizeSelect">Show:</label>
+                            <select id="tasksPageSizeSelect" class="page-size-select" onchange="changePageSize('tasks', this.value)">
+                                <option value="5">5</option>
+                                <option value="10" selected>10</option>
+                                <option value="20">20</option>
+                            </select>
+                            <span>entries</span>
+                        </div>
+                    </div>
+                    <div class="pagination-nav">
+                        <button class="page-btn" id="tasksPrevBtn" onclick="changeTasksPage(-1)">« Prev</button>
+                        <span id="tasksPageNumbers" class="pagination-nav"></span>
+                        <button class="page-btn" id="tasksNextBtn" onclick="changeTasksPage(1)">Next »</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==========================================================================
+             SECTION 4: HOUSEKEEPERS
+             ========================================================================== -->
+        <div class="section-view" id="view-staff">
+            <div class="section-box">
+                <h2>3. Housekeeping Staff & Workload Monitoring</h2>
+                <form id="addStaffForm" onsubmit="createHousekeeper(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Staff Name:</label>
+                            <input type="text" id="staffName" placeholder="e.g. Alice Smith" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address:</label>
+                            <input type="email" id="staffEmail" placeholder="e.g. alice@hotel.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone:</label>
+                            <input type="text" id="staffPhone" placeholder="e.g. 555-0199">
+                        </div>
+                        <div class="form-group" style="flex: 0; min-width: 150px;">
+                            <button type="submit" class="btn-green">+ Register Staff</button>
+                        </div>
+                    </div>
+                </form>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">ID</th>
+                            <th>Name</th>
+                            <th>Email / Phone</th>
+                            <th style="width: 110px;">Status</th>
+                            <th style="width: 110px;">Active Tasks</th>
+                            <th style="width: 120px;">Completed Tasks</th>
+                            <th style="width: 140px;">Avg Turnaround</th>
+                            <th style="width: 220px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="staffTableBody">
+                        <tr>
+                            <td colspan="8" style="text-align:center;">Loading housekeeping staff...</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="pagination-container" id="staffPagination">
+                    <div class="pagination-left">
+                        <span class="pagination-info" id="staffPageInfo">Showing 0-0 of 0 staff</span>
+                        <div class="page-size-selector">
+                            <label for="staffPageSizeSelect">Show:</label>
+                            <select id="staffPageSizeSelect" class="page-size-select" onchange="changePageSize('staff', this.value)">
+                                <option value="5">5</option>
+                                <option value="10" selected>10</option>
+                                <option value="20">20</option>
+                            </select>
+                            <span>entries</span>
+                        </div>
+                    </div>
+                    <div class="pagination-nav">
+                        <button class="page-btn" id="staffPrevBtn" onclick="changeStaffPage(-1)">« Prev</button>
+                        <span id="staffPageNumbers" class="pagination-nav"></span>
+                        <button class="page-btn" id="staffNextBtn" onclick="changeStaffPage(1)">Next »</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==========================================================================
+             SECTION 5: INSPECTIONS
+             ========================================================================== -->
+        <div class="section-view" id="view-inspections">
+            <div class="section-box">
+                <h2>4. Supervisor Inspection History</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">Insp ID</th>
+                            <th style="width: 90px;">Room #</th>
+                            <th style="width: 140px;">Supervisor</th>
+                            <th style="width: 110px;">Result</th>
+                            <th>Feedback / Failure Comments</th>
+                            <th style="width: 160px;">Inspected At</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inspectionsTableBody">
+                        <tr>
+                            <td colspan="6" style="text-align:center;">Loading inspections...</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="pagination-container" id="inspectionsPagination">
+                    <div class="pagination-left">
+                        <span class="pagination-info" id="inspectionsPageInfo">Showing 0-0 of 0 inspections</span>
+                        <div class="page-size-selector">
+                            <label for="inspectionsPageSizeSelect">Show:</label>
+                            <select id="inspectionsPageSizeSelect" class="page-size-select" onchange="changePageSize('inspections', this.value)">
+                                <option value="5">5</option>
+                                <option value="10" selected>10</option>
+                                <option value="20">20</option>
+                            </select>
+                            <span>entries</span>
+                        </div>
+                    </div>
+                    <div class="pagination-nav">
+                        <button class="page-btn" id="inspectionsPrevBtn" onclick="changeInspectionsPage(-1)">« Prev</button>
+                        <span id="inspectionsPageNumbers" class="pagination-nav"></span>
+                        <button class="page-btn" id="inspectionsNextBtn" onclick="changeInspectionsPage(1)">Next »</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==========================================================================
+             SECTION 6: AUDIT TRAIL
+             ========================================================================== -->
+        <div class="section-view" id="view-audit">
+            <div class="section-box">
+                <h2>
+                    <span>5. Operational Audit Trail & Accountability Log</span>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn-sm btn-orange" onclick="revertLastAction()" title="Revert the most recent operational action">&#x21ba; Revert Last Action</button>
+                        <button class="btn-sm btn-purple" onclick="openDownloadModal()">&#x2913; Download Audit Logs</button>
+                    </div>
+                </h2>
+                <div class="info-note">
+                    <strong>Accountability & Change Tracking:</strong> Records chronological operational changes, actors,
+                    entity targets, and state events. Real-time updates alert you to changes on other pages.
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">ID</th>
+                            <th style="width: 155px;">Timestamp</th>
+                            <th style="width: 150px;">Action</th>
+                            <th style="width: 120px;">Entity</th>
+                            <th style="width: 120px;">Actor</th>
+                            <th>Event Details</th>
+                            <th style="width: 90px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="auditTableBody">
+                        <tr>
+                            <td colspan="7" style="text-align:center;">Loading audit trail...</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="pagination-container" id="auditPagination">
+                    <div class="pagination-left">
+                        <span class="pagination-info" id="auditPageInfo">Showing 0-0 of 0 audit logs</span>
+                        <div class="page-size-selector">
+                            <label for="auditPageSizeSelect">Show:</label>
+                            <select id="auditPageSizeSelect" class="page-size-select" onchange="changePageSize('audit', this.value)">
+                                <option value="5">5</option>
+                                <option value="10" selected>10</option>
+                                <option value="20">20</option>
+                            </select>
+                            <span>entries</span>
+                        </div>
+                    </div>
+                    <div class="pagination-nav">
+                        <button class="page-btn" id="auditPrevBtn" onclick="changeAuditPage(-1)">« Prev</button>
+                        <span id="auditPageNumbers" class="pagination-nav"></span>
+                        <button class="page-btn" id="auditNextBtn" onclick="changeAuditPage(1)">Next »</button>
+                    </div>
                 </div>
             </div>
         </div>
 
         <footer>
-            HouseKeepTrack Hotel Management System &bull; Spring Boot 4.1 &bull; Java 25 &bull; Spring Cache &bull;
-            Operational Audit Logging
+            HouseKeepTrack Hotel Management System &bull; Material 3 Expressive &bull; Spring Boot 4.1 &bull; Java 25 &bull; Spring Cache &bull; Operational Audit Logging
         </footer>
     </div>
 
-    <!-- Inspection Modal Dialog -->
+    <!-- Supervisor Inspection Modal Dialog -->
     <div id="inspectionModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">Supervisor Inspection: Room <span id="modalRoomNumber"></span></div>
             <form id="inspectionForm" onsubmit="submitInspection(event)">
                 <input type="hidden" id="modalRoomId">
-                <div class="form-group" style="margin-bottom: 12px;">
+                <div class="form-group" style="margin-bottom: 14px;">
                     <label>Supervisor Name:</label>
                     <input type="text" id="modalSupervisorName" value="Chief Inspector" required>
                 </div>
-                <div class="form-group" style="margin-bottom: 12px;">
+                <div class="form-group" style="margin-bottom: 14px;">
                     <label>Inspection Evaluation:</label>
                     <select id="modalInspectionResult" onchange="toggleInspectionResultUI()">
                         <option value="PASSED">PASSED - Work Approved</option>
                         <option value="FAILED">FAILED - Improper Cleaning (Re-clean Required)</option>
                     </select>
                 </div>
-                <div class="form-group" style="margin-bottom: 14px;">
-                    <label id="modalCommentsLabel">Comments / Remarks:</label>
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label id="modalCommentsLabel">Approval Remarks (Optional):</label>
                     <textarea id="modalComments" rows="3"
                         placeholder="Enter inspection remarks or defect details..."></textarea>
                 </div>
                 <div class="modal-actions">
-                    <button type="button" class="btn-sm" style="background:#6c757d;"
-                        onclick="closeInspectionModal()">Cancel</button>
+                    <button type="button" class="btn-sm btn-gray" onclick="closeInspectionModal()">Cancel</button>
                     <button type="submit" id="modalSubmitBtn" class="btn-green">Submit PASSED</button>
                 </div>
             </form>
@@ -835,8 +1554,8 @@
     <!-- Audit Log Format Picker Download Modal Dialog -->
     <div id="downloadModal" class="modal">
         <div class="modal-content">
-            <div class="modal-header"> Download Audit Logs</div>
-            <p style="font-size: 13px; color: #555; margin-bottom: 16px;">
+            <div class="modal-header">&#x2913; Download Audit Logs</div>
+            <p style="font-size: 13px; color: var(--md-sys-color-outline); margin-bottom: 16px;">
                 Select your preferred export format for operational records and compliance reporting:
             </p>
             <form id="downloadForm" onsubmit="submitDownload(event)">
@@ -845,7 +1564,7 @@
                         <input type="radio" name="downloadFormat" value="md" checked>
                         <div>
                             <strong>Markdown Format (.md)</strong>
-                            <div style="font-size: 12px; color: #666; margin-top: 2px;">
+                            <div style="font-size: 12px; color: var(--md-sys-color-outline); margin-top: 2px;">
                                 Formatted document with header summary, timestamps, and structured Markdown table.
                             </div>
                         </div>
@@ -854,15 +1573,14 @@
                         <input type="radio" name="downloadFormat" value="txt">
                         <div>
                             <strong>Plain Text Format (.txt)</strong>
-                            <div style="font-size: 12px; color: #666; margin-top: 2px;">
+                            <div style="font-size: 12px; color: var(--md-sys-color-outline); margin-top: 2px;">
                                 Standard monospace formatted chronological text log for system archiving.
                             </div>
                         </div>
                     </label>
                 </div>
                 <div class="modal-actions">
-                    <button type="button" class="btn-sm" style="background:#6c757d;"
-                        onclick="closeDownloadModal()">Cancel</button>
+                    <button type="button" class="btn-sm btn-gray" onclick="closeDownloadModal()">Cancel</button>
                     <button type="submit" class="btn-green">Download File</button>
                 </div>
             </form>
@@ -871,8 +1589,29 @@
 
     <script>
         const API_BASE = '/api';
-        const PAGE_SIZE = 5;
-        const BIN_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 3px;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>';
+        const BIN_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>';
+
+        // Default pagination size is 10 as specified in M3 plan
+        const DEFAULT_PAGE_SIZE = 10;
+        const pageSizes = {
+            rooms: DEFAULT_PAGE_SIZE,
+            tasks: DEFAULT_PAGE_SIZE,
+            staff: DEFAULT_PAGE_SIZE,
+            inspections: DEFAULT_PAGE_SIZE,
+            audit: DEFAULT_PAGE_SIZE
+        };
+
+        // Active navigation tab
+        let currentTab = 'dashboard';
+
+        // Unread alert status for inactive tabs (pulses with alertBlinkRedAmber until clicked)
+        const unreadTabAlerts = {
+            rooms: false,
+            tasks: false,
+            staff: false,
+            inspections: false,
+            audit: false
+        };
 
         // Data caches
         let allRooms = [];
@@ -898,17 +1637,176 @@
             audit: new Set()
         };
 
-        // Snapshot caches to detect changes on non-viewed pages
+        // Snapshot caches to detect changes on non-viewed pages and tabs
         const previousSnapshots = {
             rooms: {},
             tasks: {},
             staff: {},
             inspectionsCount: 0,
             auditMaxId: 0,
+            auditCount: 0,
             initialized: false
         };
 
-        // Show temporary alert banner
+        // ==========================================================================
+        // Theme Toggle (Auto / Light / Dark)
+        // ==========================================================================
+        let currentThemeMode = localStorage.getItem('housekeeptrack_theme') || 'auto';
+
+        function initTheme() {
+            applyTheme(currentThemeMode);
+        }
+
+        function applyTheme(theme) {
+            currentThemeMode = theme;
+            localStorage.setItem('housekeeptrack_theme', theme);
+            const btn = document.getElementById('themeToggleBtn');
+            if (theme === 'auto') {
+                document.documentElement.removeAttribute('data-theme');
+                if (btn) btn.innerHTML = 'Theme: Auto';
+            } else if (theme === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+                if (btn) btn.innerHTML = 'Theme: Light';
+            } else if (theme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                if (btn) btn.innerHTML = 'Theme: Dark';
+            }
+        }
+
+        function cycleTheme() {
+            if (currentThemeMode === 'auto') applyTheme('light');
+            else if (currentThemeMode === 'light') applyTheme('dark');
+            else applyTheme('auto');
+        }
+
+        // ==========================================================================
+        // Section Navigation Logic
+        // ==========================================================================
+        function switchTab(tabId) {
+            currentTab = tabId;
+            unreadTabAlerts[tabId] = false; // extinguished upon reading
+
+            // Update tab navigation button classes
+            document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+                if (btn.dataset.tab === tabId) {
+                    btn.classList.add('active');
+                    btn.classList.remove('tab-alert-blink');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // Show active section, hide all others
+            document.querySelectorAll('.section-view').forEach(view => {
+                if (view.id === `view-${tabId}`) {
+                    view.classList.add('active');
+                } else {
+                    view.classList.remove('active');
+                }
+            });
+
+            // Re-evaluate indicators on remaining inactive tabs
+            updateTabAlertIndicators();
+        }
+
+        function updateTabAlertIndicators() {
+            ['rooms', 'tasks', 'staff', 'inspections', 'audit'].forEach(tab => {
+                const btn = document.querySelector(`.nav-tab-btn[data-tab="${tab}"]`);
+                if (btn) {
+                    if (unreadTabAlerts[tab] && currentTab !== tab) {
+                        btn.classList.add('tab-alert-blink');
+                    } else {
+                        btn.classList.remove('tab-alert-blink');
+                    }
+                }
+            });
+        }
+
+        // ==========================================================================
+        // Page Size Selector Logic
+        // ==========================================================================
+        function getPageSize(tableKey) {
+            return pageSizes[tableKey] || DEFAULT_PAGE_SIZE;
+        }
+
+        function changePageSize(tableKey, newSize) {
+            const size = parseInt(newSize, 10) || DEFAULT_PAGE_SIZE;
+            pageSizes[tableKey] = size;
+
+            if (tableKey === 'rooms') {
+                roomsPage = 1;
+                renderRoomsTable();
+                renderPagination('rooms', allRooms.length, roomsPage, setRoomsPage);
+            } else if (tableKey === 'tasks') {
+                tasksPage = 1;
+                renderTasksTable();
+                renderPagination('tasks', allTasks.length, tasksPage, setTasksPage);
+            } else if (tableKey === 'staff') {
+                staffPage = 1;
+                renderStaffTable(lastWorkMap);
+                renderPagination('staff', allStaff.length, staffPage, setStaffPage);
+            } else if (tableKey === 'inspections') {
+                inspectionsPage = 1;
+                renderInspectionsTable();
+                renderPagination('inspections', allInspections.length, inspectionsPage, setInspectionsPage);
+            } else if (tableKey === 'audit') {
+                auditPage = 1;
+                renderAuditTable();
+                renderPagination('audit', allAuditLogs.length, auditPage, setAuditPage);
+            }
+        }
+
+        // ==========================================================================
+        // Generic Pagination UI Renderer with Blinking Page Number Alert
+        // ==========================================================================
+        function renderPagination(tableKey, totalItems, currentPage, onPageSelectFn) {
+            const pageSize = getPageSize(tableKey);
+            const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+            const prevBtn = document.getElementById(`${tableKey}PrevBtn`);
+            const nextBtn = document.getElementById(`${tableKey}NextBtn`);
+            const pageNumbersContainer = document.getElementById(`${tableKey}PageNumbers`);
+            const infoSpan = document.getElementById(`${tableKey}PageInfo`);
+
+            if (prevBtn) prevBtn.disabled = (currentPage <= 1);
+            if (nextBtn) nextBtn.disabled = (currentPage >= totalPages);
+
+            const startItem = totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+            const endItem = Math.min(totalItems, currentPage * pageSize);
+            if (infoSpan) {
+                infoSpan.textContent = `Showing ${startItem}-${endItem} of ${totalItems} (Page ${currentPage} of ${totalPages})`;
+            }
+
+            if (!pageNumbersContainer) return;
+            pageNumbersContainer.innerHTML = '';
+
+            // User is actively reading currentPage: clear unread alert for this page
+            unreadAlertPages[tableKey].delete(currentPage);
+
+            for (let p = 1; p <= totalPages; p++) {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.textContent = p;
+                btn.className = 'page-btn';
+
+                if (p === currentPage) {
+                    btn.classList.add('active');
+                } else if (unreadAlertPages[tableKey].has(p)) {
+                    btn.classList.add('page-alert-blink');
+                    btn.title = 'Unread activity or status update on this page!';
+                }
+
+                btn.onclick = () => {
+                    unreadAlertPages[tableKey].delete(p);
+                    onPageSelectFn(p);
+                };
+
+                pageNumbersContainer.appendChild(btn);
+            }
+        }
+
+        // ==========================================================================
+        // Temporary Feedback Alert Banner
+        // ==========================================================================
         function showAlert(message, isError = false) {
             const banner = document.getElementById('alertBanner');
             banner.className = isError ? 'alert-danger' : 'alert-success';
@@ -917,7 +1815,9 @@
             setTimeout(() => { banner.style.display = 'none'; }, 6000);
         }
 
-        // Refresh all data
+        // ==========================================================================
+        // Refresh All Data
+        // ==========================================================================
         async function refreshAll() {
             await Promise.all([
                 loadSummaryMetrics(),
@@ -927,10 +1827,13 @@
                 loadInspections(),
                 loadAuditLogs()
             ]);
+            updateTabAlertIndicators();
             previousSnapshots.initialized = true;
         }
 
-        // 1. Load Metrics
+        // ==========================================================================
+        // 1. Metrics & Dashboard
+        // ==========================================================================
         async function loadSummaryMetrics() {
             try {
                 const [summaryRes, turnRes] = await Promise.all([
@@ -959,83 +1862,65 @@
             }
         }
 
-        // Generic Pagination UI Renderer with Blinking Page Number Alert
-        function renderPagination(tableKey, totalItems, currentPage, onPageSelectFn) {
-            const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
-            const prevBtn = document.getElementById(`${tableKey}PrevBtn`);
-            const nextBtn = document.getElementById(`${tableKey}NextBtn`);
-            const pageNumbersContainer = document.getElementById(`${tableKey}PageNumbers`);
-            const infoSpan = document.getElementById(`${tableKey}PageInfo`);
-
-            if (prevBtn) prevBtn.disabled = (currentPage <= 1);
-            if (nextBtn) nextBtn.disabled = (currentPage >= totalPages);
-
-            const startItem = totalItems === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1;
-            const endItem = Math.min(totalItems, currentPage * PAGE_SIZE);
-            if (infoSpan) {
-                infoSpan.textContent = `Showing ${startItem}-${endItem} of ${totalItems} (Page ${currentPage} of ${totalPages})`;
-            }
-
-            if (!pageNumbersContainer) return;
-            pageNumbersContainer.innerHTML = '';
-
-            // User is actively reading currentPage: clear unread alert for this page
-            unreadAlertPages[tableKey].delete(currentPage);
-
-            for (let p = 1; p <= totalPages; p++) {
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.textContent = p;
-                btn.className = 'page-btn';
-
-                if (p === currentPage) {
-                    btn.classList.add('active');
-                } else if (unreadAlertPages[tableKey].has(p)) {
-                    // Blinking Page Number Alert: unread change on this non-current page!
-                    btn.classList.add('page-alert-blink');
-                    btn.title = 'Unread activity or status update on this page!';
-                }
-
-                btn.onclick = () => {
-                    unreadAlertPages[tableKey].delete(p);
-                    onPageSelectFn(p);
-                };
-
-                pageNumbersContainer.appendChild(btn);
-            }
-        }
-
-        // 2. Load Rooms
+        // ==========================================================================
+        // 2. Rooms Lifecycle Management
+        // ==========================================================================
         async function loadRooms() {
             try {
                 const res = await fetch(`${API_BASE}/rooms`);
                 if (!res.ok) throw new Error('Failed to fetch rooms');
                 allRooms = await res.json();
 
-                // Metric Card Breakdown
-                const counts = {};
-                allRooms.forEach(r => { counts[r.status] = (counts[r.status] || 0) + 1; });
+                // Metric Card Breakdown & Status Tiles
+                const counts = { READY: 0, OCCUPIED: 0, DIRTY: 0, IN_CLEANING: 0, CLEANED: 0, INSPECTED: 0 };
+                allRooms.forEach(r => {
+                    counts[r.status] = (counts[r.status] || 0) + 1;
+                });
+
                 const breakdownStr = Object.keys(counts).map(k => `${k}: ${counts[k]}`).join(', ');
                 document.getElementById('metricRoomBreakdown').textContent = breakdownStr || 'No rooms registered';
 
-                // Detect changes on non-current pages for blinking alert
+                // Update Dashboard Status Grid Tiles
+                const tileReady = document.getElementById('tileCountReady');
+                if (tileReady) tileReady.textContent = counts.READY || 0;
+                const tileOcc = document.getElementById('tileCountOccupied');
+                if (tileOcc) tileOcc.textContent = counts.OCCUPIED || 0;
+                const tileDirty = document.getElementById('tileCountDirty');
+                if (tileDirty) tileDirty.textContent = counts.DIRTY || 0;
+                const tileClean = document.getElementById('tileCountInCleaning');
+                if (tileClean) tileClean.textContent = counts.IN_CLEANING || 0;
+                const tileCleaned = document.getElementById('tileCountCleaned');
+                if (tileCleaned) tileCleaned.textContent = counts.CLEANED || 0;
+                const tileInsp = document.getElementById('tileCountInspected');
+                if (tileInsp) tileInsp.textContent = counts.INSPECTED || 0;
+
+                // Detect changes on non-current pages and tab alert
+                const pageSize = getPageSize('rooms');
+                let hasRoomAlert = false;
                 if (previousSnapshots.initialized) {
+                    if (allRooms.length !== Object.keys(previousSnapshots.rooms).length) {
+                        hasRoomAlert = true;
+                    }
                     allRooms.forEach((r, idx) => {
-                        const targetPage = Math.floor(idx / PAGE_SIZE) + 1;
+                        const targetPage = Math.floor(idx / pageSize) + 1;
                         const prevStatus = previousSnapshots.rooms[r.id];
                         if (prevStatus === undefined || prevStatus !== r.status) {
                             if (targetPage !== roomsPage) {
                                 unreadAlertPages.rooms.add(targetPage);
                             }
+                            hasRoomAlert = true;
                         }
                     });
+                    if (hasRoomAlert && currentTab !== 'rooms') {
+                        unreadTabAlerts.rooms = true;
+                    }
                 }
+
                 // Save snapshot
                 previousSnapshots.rooms = {};
                 allRooms.forEach(r => { previousSnapshots.rooms[r.id] = r.status; });
 
-                // Ensure current page is valid
-                const maxPage = Math.max(1, Math.ceil(allRooms.length / PAGE_SIZE));
+                const maxPage = Math.max(1, Math.ceil(allRooms.length / pageSize));
                 if (roomsPage > maxPage) roomsPage = maxPage;
 
                 renderRoomsTable();
@@ -1053,11 +1938,10 @@
         }
 
         function changeRoomsPage(delta) {
-            const maxPage = Math.max(1, Math.ceil(allRooms.length / PAGE_SIZE));
+            const pageSize = getPageSize('rooms');
+            const maxPage = Math.max(1, Math.ceil(allRooms.length / pageSize));
             const newPage = Math.max(1, Math.min(maxPage, roomsPage + delta));
-            if (newPage !== roomsPage) {
-                setRoomsPage(newPage);
-            }
+            if (newPage !== roomsPage) setRoomsPage(newPage);
         }
 
         function renderRoomsTable() {
@@ -1067,7 +1951,8 @@
                 return;
             }
 
-            const pageRooms = allRooms.slice((roomsPage - 1) * PAGE_SIZE, roomsPage * PAGE_SIZE);
+            const pageSize = getPageSize('rooms');
+            const pageRooms = allRooms.slice((roomsPage - 1) * pageSize, roomsPage * pageSize);
             tbody.innerHTML = pageRooms.map(r => {
                 const statusClass = `badge-${r.status.toLowerCase()}`;
                 let timeline = [];
@@ -1089,7 +1974,7 @@
                     `;
                 } else if (r.status === 'DIRTY' || r.status === 'IN_CLEANING') {
                     actionButtons = `
-                        <button class="btn-sm" style="background:#888;" onclick="checkInRoom(${r.id})" title="Will test barrier invariant">Test Check-In</button>
+                        <button class="btn-sm btn-gray" onclick="checkInRoom(${r.id})" title="Will test barrier invariant">Test Check-In</button>
                     `;
                 }
 
@@ -1101,14 +1986,13 @@
                         <td><strong>Room ${r.roomNumber}</strong></td>
                         <td>${r.roomType}</td>
                         <td><span class="badge ${statusClass}">${r.status}</span></td>
-                        <td><small style="color:#666;">${timelineStr}</small></td>
+                        <td><small style="color:var(--md-sys-color-outline);">${timelineStr}</small></td>
                         <td>${actionButtons}</td>
                     </tr>
                 `;
             }).join('');
         }
 
-        // Create Room
         async function createRoom(e) {
             e.preventDefault();
             const roomNumber = document.getElementById('newRoomNumber').value.trim();
@@ -1129,7 +2013,6 @@
             }
         }
 
-        // Room Actions
         async function checkInRoom(id) {
             try {
                 const res = await fetch(`${API_BASE}/rooms/${id}/check-in`, { method: 'POST' });
@@ -1180,29 +2063,39 @@
             }
         }
 
-        // 3. Load Tasks
+        // ==========================================================================
+        // 3. Cleaning Tasks & Auto-Assignment Priority Queue
+        // ==========================================================================
         async function loadTasks() {
             try {
                 const res = await fetch(`${API_BASE}/tasks`);
                 if (!res.ok) throw new Error('Failed to load tasks');
                 allTasks = await res.json();
 
-                // Detect changes for blinking alert
+                const pageSize = getPageSize('tasks');
+                let hasTaskAlert = false;
                 if (previousSnapshots.initialized) {
+                    if (allTasks.length !== Object.keys(previousSnapshots.tasks).length) {
+                        hasTaskAlert = true;
+                    }
                     allTasks.forEach((t, idx) => {
-                        const targetPage = Math.floor(idx / PAGE_SIZE) + 1;
+                        const targetPage = Math.floor(idx / pageSize) + 1;
                         const prev = previousSnapshots.tasks[t.id];
                         if (!prev || prev.status !== t.status || prev.priority !== t.priority) {
                             if (targetPage !== tasksPage) {
                                 unreadAlertPages.tasks.add(targetPage);
                             }
+                            hasTaskAlert = true;
                         }
                     });
+                    if (hasTaskAlert && currentTab !== 'tasks') {
+                        unreadTabAlerts.tasks = true;
+                    }
                 }
                 previousSnapshots.tasks = {};
                 allTasks.forEach(t => { previousSnapshots.tasks[t.id] = { status: t.status, priority: t.priority }; });
 
-                const maxPage = Math.max(1, Math.ceil(allTasks.length / PAGE_SIZE));
+                const maxPage = Math.max(1, Math.ceil(allTasks.length / pageSize));
                 if (tasksPage > maxPage) tasksPage = maxPage;
 
                 renderTasksTable();
@@ -1220,7 +2113,8 @@
         }
 
         function changeTasksPage(delta) {
-            const maxPage = Math.max(1, Math.ceil(allTasks.length / PAGE_SIZE));
+            const pageSize = getPageSize('tasks');
+            const maxPage = Math.max(1, Math.ceil(allTasks.length / pageSize));
             const newPage = Math.max(1, Math.min(maxPage, tasksPage + delta));
             if (newPage !== tasksPage) setTasksPage(newPage);
         }
@@ -1232,17 +2126,18 @@
                 return;
             }
 
-            const pageTasks = allTasks.slice((tasksPage - 1) * PAGE_SIZE, tasksPage * PAGE_SIZE);
+            const pageSize = getPageSize('tasks');
+            const pageTasks = allTasks.slice((tasksPage - 1) * pageSize, tasksPage * pageSize);
             tbody.innerHTML = pageTasks.map(t => {
                 const priorityBadge = t.priority === 'HIGH'
-                    ? '<span class="badge-priority-high">&#9888; HIGH</span>'
+                    ? '<span class="badge-priority-high">HIGH</span>'
                     : '<span class="badge-priority-normal">NORMAL</span>';
 
                 let actionBtn = '-';
                 if (t.status === 'IN_PROGRESS') {
                     actionBtn = `<button class="btn-sm btn-green" onclick="completeTask(${t.id})">Complete Cleaning</button>`;
                 } else if (t.status === 'PENDING') {
-                    actionBtn = `<span style="color:#d9534f; font-weight:bold; font-size:12px;">Queued (Waiting)</span>`;
+                    actionBtn = `<span style="color:#dc3545; font-weight:bold; font-size:12px;">Queued (Waiting)</span>`;
                 } else if (t.status === 'COMPLETED') {
                     actionBtn = `<span style="color:#28a745; font-size:12px;">Done (${formatTime(t.completedAt)})</span>`;
                 }
@@ -1253,7 +2148,7 @@
                         <td><strong>Room ${t.roomNumber}</strong></td>
                         <td>${priorityBadge}</td>
                         <td><strong>${t.status}</strong></td>
-                        <td>${t.housekeeperName || '<em style="color:#888;">Unassigned</em>'}</td>
+                        <td>${t.housekeeperName || '<em style="color:var(--md-sys-color-outline);">Unassigned</em>'}</td>
                         <td>${t.notes || '-'}</td>
                         <td>${actionBtn}</td>
                     </tr>
@@ -1284,7 +2179,9 @@
             }
         }
 
-        // 4. Load Housekeepers
+        // ==========================================================================
+        // 4. Housekeeping Staff & Workload Monitoring
+        // ==========================================================================
         async function loadStaff() {
             try {
                 const [staffRes, workRes] = await Promise.all([
@@ -1301,22 +2198,30 @@
                 const availCount = allStaff.filter(s => s.status === 'AVAILABLE').length;
                 document.getElementById('metricStaffAvailable').textContent = `${availCount} Available`;
 
-                // Detect status changes for blinking alert
+                const pageSize = getPageSize('staff');
+                let hasStaffAlert = false;
                 if (previousSnapshots.initialized) {
+                    if (allStaff.length !== Object.keys(previousSnapshots.staff).length) {
+                        hasStaffAlert = true;
+                    }
                     allStaff.forEach((s, idx) => {
-                        const targetPage = Math.floor(idx / PAGE_SIZE) + 1;
+                        const targetPage = Math.floor(idx / pageSize) + 1;
                         const prevStatus = previousSnapshots.staff[s.id];
                         if (prevStatus === undefined || prevStatus !== s.status) {
                             if (targetPage !== staffPage) {
                                 unreadAlertPages.staff.add(targetPage);
                             }
+                            hasStaffAlert = true;
                         }
                     });
+                    if (hasStaffAlert && currentTab !== 'staff') {
+                        unreadTabAlerts.staff = true;
+                    }
                 }
                 previousSnapshots.staff = {};
                 allStaff.forEach(s => { previousSnapshots.staff[s.id] = s.status; });
 
-                const maxPage = Math.max(1, Math.ceil(allStaff.length / PAGE_SIZE));
+                const maxPage = Math.max(1, Math.ceil(allStaff.length / pageSize));
                 if (staffPage > maxPage) staffPage = maxPage;
 
                 renderStaffTable(lastWorkMap);
@@ -1334,7 +2239,8 @@
         }
 
         function changeStaffPage(delta) {
-            const maxPage = Math.max(1, Math.ceil(allStaff.length / PAGE_SIZE));
+            const pageSize = getPageSize('staff');
+            const maxPage = Math.max(1, Math.ceil(allStaff.length / pageSize));
             const newPage = Math.max(1, Math.min(maxPage, staffPage + delta));
             if (newPage !== staffPage) setStaffPage(newPage);
         }
@@ -1346,7 +2252,8 @@
                 return;
             }
 
-            const pageStaff = allStaff.slice((staffPage - 1) * PAGE_SIZE, staffPage * PAGE_SIZE);
+            const pageSize = getPageSize('staff');
+            const pageStaff = allStaff.slice((staffPage - 1) * pageSize, staffPage * pageSize);
             tbody.innerHTML = pageStaff.map(s => {
                 const w = workMap[s.id] || {};
                 const avgMin = w.avgTurnaroundMinutes !== null && w.avgTurnaroundMinutes !== undefined
@@ -1359,7 +2266,7 @@
                 } else if (s.status === 'OFFLINE') {
                     toggleBtn = `<button class="btn-sm btn-green" onclick="updateStaffStatus(${s.id}, 'AVAILABLE')">Go AVAILABLE</button>`;
                 } else if (s.status === 'BUSY') {
-                    toggleBtn = `<span style="font-size:12px; color:#e36a05; margin-right: 6px;">Busy on task</span>`;
+                    toggleBtn = `<span style="font-size:12px; color:#fd7e14; margin-right: 6px;">Busy on task</span>`;
                 }
 
                 const deleteStaffBtn = `<button class="btn-sm btn-red" onclick="deleteHousekeeper(${s.id})" title="Delete Housekeeper">${BIN_ICON_SVG}Delete</button>`;
@@ -1418,23 +2325,28 @@
             }
         }
 
-        // 5. Load Inspections
+        // ==========================================================================
+        // 5. Supervisor Inspections History
+        // ==========================================================================
         async function loadInspections() {
             try {
                 const res = await fetch(`${API_BASE}/inspections`);
                 if (!res.ok) throw new Error('Failed to load inspections');
                 allInspections = await res.json();
-                // Sort descending so newest inspections are displayed first (matching audit logs)
                 allInspections.sort((a, b) => (b.id || 0) - (a.id || 0));
 
-                if (previousSnapshots.initialized && allInspections.length > previousSnapshots.inspectionsCount) {
+                if (previousSnapshots.initialized && allInspections.length !== previousSnapshots.inspectionsCount) {
                     if (inspectionsPage !== 1) {
                         unreadAlertPages.inspections.add(1);
+                    }
+                    if (currentTab !== 'inspections') {
+                        unreadTabAlerts.inspections = true;
                     }
                 }
                 previousSnapshots.inspectionsCount = allInspections.length;
 
-                const maxPage = Math.max(1, Math.ceil(allInspections.length / PAGE_SIZE));
+                const pageSize = getPageSize('inspections');
+                const maxPage = Math.max(1, Math.ceil(allInspections.length / pageSize));
                 if (inspectionsPage > maxPage) inspectionsPage = maxPage;
 
                 renderInspectionsTable();
@@ -1452,7 +2364,8 @@
         }
 
         function changeInspectionsPage(delta) {
-            const maxPage = Math.max(1, Math.ceil(allInspections.length / PAGE_SIZE));
+            const pageSize = getPageSize('inspections');
+            const maxPage = Math.max(1, Math.ceil(allInspections.length / pageSize));
             const newPage = Math.max(1, Math.min(maxPage, inspectionsPage + delta));
             if (newPage !== inspectionsPage) setInspectionsPage(newPage);
         }
@@ -1464,7 +2377,8 @@
                 return;
             }
 
-            const pageItems = allInspections.slice((inspectionsPage - 1) * PAGE_SIZE, inspectionsPage * PAGE_SIZE);
+            const pageSize = getPageSize('inspections');
+            const pageItems = allInspections.slice((inspectionsPage - 1) * pageSize, inspectionsPage * pageSize);
             tbody.innerHTML = pageItems.map(i => {
                 const isPassed = i.result === 'PASSED';
                 const badge = isPassed
@@ -1484,28 +2398,32 @@
             }).join('');
         }
 
-        // 6. Load Audit Logs (5 per page with download and blinking alerts)
+        // ==========================================================================
+        // 6. Operational Audit Trail & Accountability Log
+        // ==========================================================================
         async function loadAuditLogs() {
             try {
-                // Fetch up to 100 recent logs to support client-side pagination and alert diffing
                 const res = await fetch(`${API_BASE}/audit-logs?size=100&sort=timestamp,desc`);
                 if (!res.ok) throw new Error('Failed to load audit logs');
                 const pageData = await res.json();
                 allAuditLogs = pageData.content || [];
 
-                // Detect new incoming audit logs
-                if (allAuditLogs.length > 0) {
+                if (allAuditLogs.length > 0 || (previousSnapshots.auditCount && previousSnapshots.auditCount > 0)) {
                     const currentMaxId = allAuditLogs.reduce((max, l) => (l.id > max ? l.id : max), 0);
-                    if (previousSnapshots.initialized && currentMaxId > previousSnapshots.auditMaxId) {
-                        // New logs inserted at page 1: if user is on another page, blink page 1!
+                    if (previousSnapshots.initialized && (currentMaxId > previousSnapshots.auditMaxId || allAuditLogs.length !== previousSnapshots.auditCount)) {
                         if (auditPage !== 1) {
                             unreadAlertPages.audit.add(1);
                         }
+                        if (currentTab !== 'audit') {
+                            unreadTabAlerts.audit = true;
+                        }
                     }
                     previousSnapshots.auditMaxId = currentMaxId;
+                    previousSnapshots.auditCount = allAuditLogs.length;
                 }
 
-                const maxPage = Math.max(1, Math.ceil(allAuditLogs.length / PAGE_SIZE));
+                const pageSize = getPageSize('audit');
+                const maxPage = Math.max(1, Math.ceil(allAuditLogs.length / pageSize));
                 if (auditPage > maxPage) auditPage = maxPage;
 
                 renderAuditTable();
@@ -1523,7 +2441,8 @@
         }
 
         function changeAuditPage(delta) {
-            const maxPage = Math.max(1, Math.ceil(allAuditLogs.length / PAGE_SIZE));
+            const pageSize = getPageSize('audit');
+            const maxPage = Math.max(1, Math.ceil(allAuditLogs.length / pageSize));
             const newPage = Math.max(1, Math.min(maxPage, auditPage + delta));
             if (newPage !== auditPage) setAuditPage(newPage);
         }
@@ -1535,13 +2454,14 @@
                 return;
             }
 
-            const pageLogs = allAuditLogs.slice((auditPage - 1) * PAGE_SIZE, auditPage * PAGE_SIZE);
+            const pageSize = getPageSize('audit');
+            const pageLogs = allAuditLogs.slice((auditPage - 1) * pageSize, auditPage * pageSize);
             tbody.innerHTML = pageLogs.map(log => {
                 const deleteBtn = `<button class="btn-sm btn-red" onclick="deleteAuditLog(${log.id})" title="Delete Action Entry">${BIN_ICON_SVG}Delete</button>`;
                 return `
                     <tr>
                         <td>${log.id}</td>
-                        <td><small style="color:#555;">${formatDateTime(log.timestamp)}</small></td>
+                        <td><small style="color:var(--md-sys-color-outline);">${formatDateTime(log.timestamp)}</small></td>
                         <td><span class="badge-action">${log.action}</span></td>
                         <td>${log.entityType} #${log.entityId}</td>
                         <td><strong>${log.actor}</strong></td>
@@ -1552,7 +2472,9 @@
             }).join('');
         }
 
-        // Inspection Modal Logic
+        // ==========================================================================
+        // Modal Logic: Inspection & Multi-Format Download
+        // ==========================================================================
         function openInspectionModal(roomId, roomNumber) {
             document.getElementById('modalRoomId').value = roomId;
             document.getElementById('modalRoomNumber').textContent = roomNumber;
@@ -1612,7 +2534,6 @@
             }
         }
 
-        // Single Download Button & Modal Logic
         function openDownloadModal() {
             document.getElementById('downloadModal').style.display = 'flex';
         }
@@ -1625,14 +2546,14 @@
             e.preventDefault();
             const selectedFormat = document.querySelector('input[name="downloadFormat"]:checked').value;
             closeDownloadModal();
-
-            // Trigger direct file download
             const downloadUrl = `${API_BASE}/audit-logs/download?format=${selectedFormat}`;
             window.location.href = downloadUrl;
             showAlert(`Audit log download initiated (${selectedFormat.toUpperCase()} format).`);
         }
 
-        // Revert Last Operational Action
+        // ==========================================================================
+        // Revert & Safe Deletion Operations
+        // ==========================================================================
         async function revertLastAction() {
             if (!confirm('Revert the last operational action? This will undo the state change and record a REVERTED audit entry.')) {
                 return;
@@ -1648,7 +2569,6 @@
             }
         }
 
-        // Delete Room (cascades tasks & inspections)
         async function deleteRoom(id, roomNumber) {
             if (!roomNumber) {
                 const r = allRooms.find(x => x.id === id);
@@ -1670,7 +2590,6 @@
             }
         }
 
-        // Delete Housekeeper (re-queues active tasks to PENDING)
         async function deleteHousekeeper(id, name) {
             if (!name) {
                 const s = allStaff.find(x => x.id === id);
@@ -1692,7 +2611,6 @@
             }
         }
 
-        // Delete Individual Audit Log Record
         async function deleteAuditLog(id) {
             if (!confirm(`Are you sure you want to delete audit log entry #${id}?`)) {
                 return;
@@ -1710,6 +2628,9 @@
             }
         }
 
+        // ==========================================================================
+        // Time & Date Format Helpers
+        // ==========================================================================
         function formatTime(isoStr) {
             if (!isoStr) return '-';
             const d = new Date(isoStr);
@@ -1724,25 +2645,23 @@
             return `${dateStr} ${timeStr}`;
         }
 
-        // Close modal when clicking on background outside modal-content
+        // Close modal when clicking outside modal-content
         window.onclick = function (event) {
             const inspModal = document.getElementById('inspectionModal');
             const dlModal = document.getElementById('downloadModal');
-            if (event.target === inspModal) {
-                closeInspectionModal();
-            }
-            if (event.target === dlModal) {
-                closeDownloadModal();
-            }
+            if (event.target === inspModal) closeInspectionModal();
+            if (event.target === dlModal) closeDownloadModal();
         };
 
-        // Initial Load & Auto-polling every 12 seconds
+        // ==========================================================================
+        // Initial Startup
+        // ==========================================================================
         window.addEventListener('DOMContentLoaded', () => {
+            initTheme();
             refreshAll();
             setInterval(refreshAll, 12000);
         });
     </script>
-
 </body>
 
 </html>
