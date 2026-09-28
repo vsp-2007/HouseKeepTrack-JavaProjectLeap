@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -49,6 +50,7 @@
             top: 10px;
             background-color: #6c757d;
         }
+
         .refresh-btn:hover {
             background-color: #5a6268;
         }
@@ -62,11 +64,13 @@
             font-size: 14px;
             font-weight: 500;
         }
+
         .alert-success {
             background-color: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
         }
+
         .alert-danger {
             background-color: #f8d7da;
             color: #721c24;
@@ -88,7 +92,7 @@
             border: 1px solid #ccd0d5;
             border-radius: 5px;
             padding: 14px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
         }
 
         .report-card h3 {
@@ -167,7 +171,9 @@
             color: #444;
         }
 
-        input, select, textarea {
+        input,
+        select,
+        textarea {
             padding: 7px 10px;
             font-size: 14px;
             border: 1px solid #ccc;
@@ -176,7 +182,9 @@
             box-sizing: border-box;
         }
 
-        input:focus, select:focus, textarea:focus {
+        input:focus,
+        select:focus,
+        textarea:focus {
             outline: none;
             border-color: #0066cc;
             box-shadow: 0 0 3px rgba(0, 102, 204, 0.3);
@@ -199,20 +207,45 @@
         }
 
         /* Button Colors */
-        .btn-green { background-color: #28a745; }
-        .btn-green:hover { background-color: #218838; }
+        .btn-green {
+            background-color: #28a745;
+        }
 
-        .btn-orange { background-color: #fd7e14; }
-        .btn-orange:hover { background-color: #e36a05; }
+        .btn-green:hover {
+            background-color: #218838;
+        }
 
-        .btn-purple { background-color: #6f42c1; }
-        .btn-purple:hover { background-color: #5a32a3; }
+        .btn-orange {
+            background-color: #fd7e14;
+        }
 
-        .btn-red { background-color: #dc3545; }
-        .btn-red:hover { background-color: #bd2130; }
+        .btn-orange:hover {
+            background-color: #e36a05;
+        }
 
-        .btn-teal { background-color: #17a2b8; }
-        .btn-teal:hover { background-color: #117a8b; }
+        .btn-purple {
+            background-color: #6f42c1;
+        }
+
+        .btn-purple:hover {
+            background-color: #5a32a3;
+        }
+
+        .btn-red {
+            background-color: #dc3545;
+        }
+
+        .btn-red:hover {
+            background-color: #bd2130;
+        }
+
+        .btn-teal {
+            background-color: #17a2b8;
+        }
+
+        .btn-teal:hover {
+            background-color: #117a8b;
+        }
 
         .btn-sm {
             padding: 4px 8px;
@@ -230,7 +263,9 @@
             background-color: #ffffff;
         }
 
-        table, th, td {
+        table,
+        th,
+        td {
             border: 1px solid #dddddd;
         }
 
@@ -265,12 +300,41 @@
             text-transform: uppercase;
         }
 
-        .badge-ready { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .badge-occupied { background-color: #cce5ff; color: #004085; border: 1px solid #b8daff; }
-        .badge-dirty { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        .badge-in_cleaning { background-color: #ffeeba; color: #856404; border: 1px solid #ffeeba; }
-        .badge-cleaned { background-color: #e2d9f3; color: #38147a; border: 1px solid #d1c2ec; }
-        .badge-inspected { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .badge-ready {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .badge-occupied {
+            background-color: #cce5ff;
+            color: #004085;
+            border: 1px solid #b8daff;
+        }
+
+        .badge-dirty {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .badge-in_cleaning {
+            background-color: #ffeeba;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+
+        .badge-cleaned {
+            background-color: #e2d9f3;
+            color: #38147a;
+            border: 1px solid #d1c2ec;
+        }
+
+        .badge-inspected {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
 
         .badge-priority-high {
             background-color: #ff3333;
@@ -298,7 +362,7 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.5);
+            background-color: rgba(0, 0, 0, 0.5);
             align-items: center;
             justify-content: center;
         }
@@ -309,7 +373,7 @@
             border-radius: 6px;
             width: 90%;
             max-width: 480px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         .modal-header {
@@ -338,309 +402,324 @@
         }
     </style>
 </head>
+
 <body>
 
-<div class="container">
-    <header>
-        <h1>HouseKeepTrack</h1>
-        <p class="subtitle">Hotel Room Lifecycle & Automated Housekeeping Management Portal (Spring MVC)</p>
-        <button class="refresh-btn" onclick="refreshAll()">&#x21bb; Refresh Data</button>
-    </header>
+    <div class="container">
+        <header>
+            <h1>HouseKeepTrack</h1>
+            <p class="subtitle">Hotel Room Lifecycle & Automated Housekeeping Management Portal </p>
+            <button class="refresh-btn" onclick="refreshAll()">&#x21bb; Refresh Data</button>
+        </header>
 
-    <!-- Global Feedback Alert Banner -->
-    <div id="alertBanner"></div>
+        <!-- Global Feedback Alert Banner -->
+        <div id="alertBanner"></div>
 
-    <!-- 1. System Overview Metrics Cards -->
-    <div class="report-cards">
-        <div class="report-card">
-            <h3>Total Rooms</h3>
-            <div class="metric-val" id="metricTotalRooms">-</div>
-            <div class="metric-sub" id="metricRoomBreakdown">Loading room states...</div>
+        <!-- 1. System Overview Metrics Cards -->
+        <div class="report-cards">
+            <div class="report-card">
+                <h3>Total Rooms</h3>
+                <div class="metric-val" id="metricTotalRooms">-</div>
+                <div class="metric-sub" id="metricRoomBreakdown">Loading room states...</div>
+            </div>
+            <div class="report-card">
+                <h3>Housekeepers</h3>
+                <div class="metric-val" id="metricTotalStaff">-</div>
+                <div class="metric-sub" id="metricStaffAvailable">- Available</div>
+            </div>
+            <div class="report-card">
+                <h3>Cleaning Tasks</h3>
+                <div class="metric-val" id="metricCompletedTasks">-</div>
+                <div class="metric-sub" id="metricPendingTasks">- In queue / active</div>
+            </div>
+            <div class="report-card">
+                <h3>Avg Room Turnaround</h3>
+                <div class="metric-val" id="metricAvgTurnaround">-</div>
+                <div class="metric-sub">Dirty to Ready cycle</div>
+            </div>
         </div>
-        <div class="report-card">
-            <h3>Housekeepers</h3>
-            <div class="metric-val" id="metricTotalStaff">-</div>
-            <div class="metric-sub" id="metricStaffAvailable">- Available</div>
+
+        <!-- 2. Room Lifecycle Management -->
+        <div class="section-box">
+            <h2>1. Hotel Rooms & Lifecycle Status</h2>
+            <div class="info-note">
+                <strong>Strict Lifecycle Flow:</strong> OCCUPIED &rarr; DIRTY (checkout) &rarr; IN_CLEANING &rarr;
+                CLEANED &rarr; INSPECTED &rarr; READY &rarr; OCCUPIED.
+                <br><em>* Rooms cannot be checked in unless status is strictly <strong>READY</strong>. Failed
+                    inspections revert room to <strong>DIRTY</strong> with HIGH-priority re-cleaning.</em>
+            </div>
+
+            <form id="addRoomForm" onsubmit="createRoom(event)">
+                <div class="form-row">
+                    <div class="form-group" style="max-width: 180px;">
+                        <label>Room Number:</label>
+                        <input type="text" id="newRoomNumber" placeholder="e.g. 101" required>
+                    </div>
+                    <div class="form-group" style="max-width: 200px;">
+                        <label>Room Type:</label>
+                        <select id="newRoomType">
+                            <option value="STANDARD">STANDARD</option>
+                            <option value="DELUXE" selected>DELUXE</option>
+                            <option value="SUITE">SUITE</option>
+                            <option value="EXECUTIVE">EXECUTIVE</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="flex: 0; min-width: 140px;">
+                        <button type="submit" class="btn-green">+ Add Room</button>
+                    </div>
+                </div>
+            </form>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">ID</th>
+                        <th style="width: 100px;">Room #</th>
+                        <th style="width: 110px;">Type</th>
+                        <th style="width: 130px;">Status</th>
+                        <th>Timeline Details</th>
+                        <th style="width: 250px;">Lifecycle Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="roomsTableBody">
+                    <tr>
+                        <td colspan="6" style="text-align:center;">Loading rooms...</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-        <div class="report-card">
-            <h3>Cleaning Tasks</h3>
-            <div class="metric-val" id="metricCompletedTasks">-</div>
-            <div class="metric-sub" id="metricPendingTasks">- In queue / active</div>
+
+        <!-- 3. Active Cleaning Tasks & Priority Queue -->
+        <div class="section-box">
+            <h2>
+                2. Cleaning Tasks & Auto-Assignment Priority Queue
+                <button class="btn-sm btn-teal" onclick="triggerQueueDispatch()">&#9654; Force Queue Dispatch</button>
+            </h2>
+            <div class="info-note">
+                <strong>Dual High-Priority Rules:</strong> (1) Inspection-failed rooms receive <strong>HIGH</strong>
+                priority. (2) Longest-waiting dirty rooms dynamically escalate to <strong>HIGH</strong> priority.
+                Available workers pick HIGH priority tasks before normal checkout tasks.
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 60px;">Task ID</th>
+                        <th style="width: 90px;">Room #</th>
+                        <th style="width: 90px;">Priority</th>
+                        <th style="width: 120px;">Task Status</th>
+                        <th style="width: 160px;">Assigned Worker</th>
+                        <th>Notes / Defect Remarks</th>
+                        <th style="width: 130px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tasksTableBody">
+                    <tr>
+                        <td colspan="7" style="text-align:center;">Loading cleaning tasks...</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-        <div class="report-card">
-            <h3>Avg Room Turnaround</h3>
-            <div class="metric-val" id="metricAvgTurnaround">-</div>
-            <div class="metric-sub">Dirty to Ready cycle</div>
+
+        <!-- 4. Housekeeping Staff & Workload -->
+        <div class="section-box">
+            <h2>3. Housekeeping Staff & Workload Monitoring</h2>
+            <form id="addStaffForm" onsubmit="createHousekeeper(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Staff Name:</label>
+                        <input type="text" id="staffName" placeholder="e.g. Alice Smith" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address:</label>
+                        <input type="email" id="staffEmail" placeholder="e.g. alice@hotel.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone:</label>
+                        <input type="text" id="staffPhone" placeholder="e.g. 555-0199">
+                    </div>
+                    <div class="form-group" style="flex: 0; min-width: 150px;">
+                        <button type="submit">+ Register Staff</button>
+                    </div>
+                </div>
+            </form>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">ID</th>
+                        <th>Name</th>
+                        <th>Email / Phone</th>
+                        <th style="width: 110px;">Status</th>
+                        <th style="width: 110px;">Active Tasks</th>
+                        <th style="width: 120px;">Completed Tasks</th>
+                        <th style="width: 140px;">Avg Turnaround</th>
+                        <th style="width: 160px;">Status Toggle</th>
+                    </tr>
+                </thead>
+                <tbody id="staffTableBody">
+                    <tr>
+                        <td colspan="8" style="text-align:center;">Loading housekeeping staff...</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
+
+        <!-- 5. Supervisor Inspection Log -->
+        <div class="section-box">
+            <h2>4. Supervisor Inspection History</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 60px;">Insp ID</th>
+                        <th style="width: 90px;">Room #</th>
+                        <th style="width: 140px;">Supervisor</th>
+                        <th style="width: 110px;">Result</th>
+                        <th>Feedback / Failure Comments</th>
+                        <th style="width: 160px;">Inspected At</th>
+                    </tr>
+                </thead>
+                <tbody id="inspectionsTableBody">
+                    <tr>
+                        <td colspan="6" style="text-align:center;">Loading inspections...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <footer>
+            HouseKeepTrack Hotel Management System &bull; Spring Boot 3.4 &bull; Java 25 &bull; MySQL 8.0
+        </footer>
     </div>
 
-    <!-- 2. Room Lifecycle Management -->
-    <div class="section-box">
-        <h2>1. Hotel Rooms & Lifecycle Status</h2>
-        <div class="info-note">
-            <strong>Strict Lifecycle Flow:</strong> OCCUPIED &rarr; DIRTY (checkout) &rarr; IN_CLEANING &rarr; CLEANED &rarr; INSPECTED &rarr; READY &rarr; OCCUPIED.
-            <br><em>* Rooms cannot be checked in unless status is strictly <strong>READY</strong>. Failed inspections revert room to <strong>DIRTY</strong> with HIGH-priority re-cleaning.</em>
-        </div>
-
-        <form id="addRoomForm" onsubmit="createRoom(event)">
-            <div class="form-row">
-                <div class="form-group" style="max-width: 180px;">
-                    <label>Room Number:</label>
-                    <input type="text" id="newRoomNumber" placeholder="e.g. 101" required>
+    <!-- Inspection Modal Dialog -->
+    <div id="inspectionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Supervisor Inspection: Room <span id="modalRoomNumber"></span></div>
+            <form id="inspectionForm" onsubmit="submitInspection(event)">
+                <input type="hidden" id="modalRoomId">
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label>Supervisor Name:</label>
+                    <input type="text" id="modalSupervisorName" value="Chief Inspector" required>
                 </div>
-                <div class="form-group" style="max-width: 200px;">
-                    <label>Room Type:</label>
-                    <select id="newRoomType">
-                        <option value="STANDARD">STANDARD</option>
-                        <option value="DELUXE" selected>DELUXE</option>
-                        <option value="SUITE">SUITE</option>
-                        <option value="EXECUTIVE">EXECUTIVE</option>
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label>Inspection Evaluation:</label>
+                    <select id="modalInspectionResult" onchange="toggleInspectionResultUI()">
+                        <option value="PASSED">PASSED - Work Approved</option>
+                        <option value="FAILED">FAILED - Improper Cleaning (Re-clean Required)</option>
                     </select>
                 </div>
-                <div class="form-group" style="flex: 0; min-width: 140px;">
-                    <button type="submit" class="btn-green">+ Add Room</button>
+                <div class="form-group" style="margin-bottom: 14px;">
+                    <label id="modalCommentsLabel">Comments / Remarks:</label>
+                    <textarea id="modalComments" rows="3"
+                        placeholder="Enter inspection remarks or defect details..."></textarea>
                 </div>
-            </div>
-        </form>
-
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 50px;">ID</th>
-                    <th style="width: 100px;">Room #</th>
-                    <th style="width: 110px;">Type</th>
-                    <th style="width: 130px;">Status</th>
-                    <th>Timeline Details</th>
-                    <th style="width: 250px;">Lifecycle Actions</th>
-                </tr>
-            </thead>
-            <tbody id="roomsTableBody">
-                <tr><td colspan="6" style="text-align:center;">Loading rooms...</td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- 3. Active Cleaning Tasks & Priority Queue -->
-    <div class="section-box">
-        <h2>
-            2. Cleaning Tasks & Auto-Assignment Priority Queue
-            <button class="btn-sm btn-teal" onclick="triggerQueueDispatch()">&#9654; Force Queue Dispatch</button>
-        </h2>
-        <div class="info-note">
-            <strong>Dual High-Priority Rules:</strong> (1) Inspection-failed rooms receive <strong>HIGH</strong> priority. (2) Longest-waiting dirty rooms dynamically escalate to <strong>HIGH</strong> priority. Available workers pick HIGH priority tasks before normal checkout tasks.
+                <div class="modal-actions">
+                    <button type="button" class="btn-sm" style="background:#6c757d;"
+                        onclick="closeInspectionModal()">Cancel</button>
+                    <button type="submit" id="modalSubmitBtn" class="btn-green">Submit PASSED</button>
+                </div>
+            </form>
         </div>
-
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 60px;">Task ID</th>
-                    <th style="width: 90px;">Room #</th>
-                    <th style="width: 90px;">Priority</th>
-                    <th style="width: 120px;">Task Status</th>
-                    <th style="width: 160px;">Assigned Worker</th>
-                    <th>Notes / Defect Remarks</th>
-                    <th style="width: 130px;">Action</th>
-                </tr>
-            </thead>
-            <tbody id="tasksTableBody">
-                <tr><td colspan="7" style="text-align:center;">Loading cleaning tasks...</td></tr>
-            </tbody>
-        </table>
     </div>
 
-    <!-- 4. Housekeeping Staff & Workload -->
-    <div class="section-box">
-        <h2>3. Housekeeping Staff & Workload Monitoring</h2>
-        <form id="addStaffForm" onsubmit="createHousekeeper(event)">
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Staff Name:</label>
-                    <input type="text" id="staffName" placeholder="e.g. Alice Smith" required>
-                </div>
-                <div class="form-group">
-                    <label>Email Address:</label>
-                    <input type="email" id="staffEmail" placeholder="e.g. alice@hotel.com" required>
-                </div>
-                <div class="form-group">
-                    <label>Phone:</label>
-                    <input type="text" id="staffPhone" placeholder="e.g. 555-0199">
-                </div>
-                <div class="form-group" style="flex: 0; min-width: 150px;">
-                    <button type="submit">+ Register Staff</button>
-                </div>
-            </div>
-        </form>
+    <script>
+        const API_BASE = '/api';
 
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 50px;">ID</th>
-                    <th>Name</th>
-                    <th>Email / Phone</th>
-                    <th style="width: 110px;">Status</th>
-                    <th style="width: 110px;">Active Tasks</th>
-                    <th style="width: 120px;">Completed Tasks</th>
-                    <th style="width: 140px;">Avg Turnaround</th>
-                    <th style="width: 160px;">Status Toggle</th>
-                </tr>
-            </thead>
-            <tbody id="staffTableBody">
-                <tr><td colspan="8" style="text-align:center;">Loading housekeeping staff...</td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- 5. Supervisor Inspection Log -->
-    <div class="section-box">
-        <h2>4. Supervisor Inspection History</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 60px;">Insp ID</th>
-                    <th style="width: 90px;">Room #</th>
-                    <th style="width: 140px;">Supervisor</th>
-                    <th style="width: 110px;">Result</th>
-                    <th>Feedback / Failure Comments</th>
-                    <th style="width: 160px;">Inspected At</th>
-                </tr>
-            </thead>
-            <tbody id="inspectionsTableBody">
-                <tr><td colspan="6" style="text-align:center;">Loading inspections...</td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <footer>
-        HouseKeepTrack Hotel Management System &bull; Spring Boot 3.4 &bull; Java 25 &bull; MySQL 8.0 &bull; Spring MVC Architecture
-    </footer>
-</div>
-
-<!-- Inspection Modal Dialog -->
-<div id="inspectionModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">Supervisor Inspection: Room <span id="modalRoomNumber"></span></div>
-        <form id="inspectionForm" onsubmit="submitInspection(event)">
-            <input type="hidden" id="modalRoomId">
-            <div class="form-group" style="margin-bottom: 12px;">
-                <label>Supervisor Name:</label>
-                <input type="text" id="modalSupervisorName" value="Chief Inspector" required>
-            </div>
-            <div class="form-group" style="margin-bottom: 12px;">
-                <label>Inspection Evaluation:</label>
-                <select id="modalInspectionResult" onchange="toggleInspectionResultUI()">
-                    <option value="PASSED">PASSED - Work Approved</option>
-                    <option value="FAILED">FAILED - Improper Cleaning (Re-clean Required)</option>
-                </select>
-            </div>
-            <div class="form-group" style="margin-bottom: 14px;">
-                <label id="modalCommentsLabel">Comments / Remarks:</label>
-                <textarea id="modalComments" rows="3" placeholder="Enter inspection remarks or defect details..."></textarea>
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn-sm" style="background:#6c757d;" onclick="closeInspectionModal()">Cancel</button>
-                <button type="submit" id="modalSubmitBtn" class="btn-green">Submit PASSED</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<script>
-    const API_BASE = '/api';
-
-    // Show temporary alert banner
-    function showAlert(message, isError = false) {
-        const banner = document.getElementById('alertBanner');
-        banner.className = isError ? 'alert-danger' : 'alert-success';
-        banner.textContent = message;
-        banner.style.display = 'block';
-        setTimeout(() => { banner.style.display = 'none'; }, 6000);
-    }
-
-    // Refresh all data
-    async function refreshAll() {
-        await Promise.all([
-            loadSummaryMetrics(),
-            loadRooms(),
-            loadTasks(),
-            loadStaff(),
-            loadInspections()
-        ]);
-    }
-
-    // 1. Load Metrics
-    async function loadSummaryMetrics() {
-        try {
-            const [summaryRes, turnRes] = await Promise.all([
-                fetch(`${API_BASE}/metrics/summary`),
-                fetch(`${API_BASE}/metrics/room-turnaround`)
-            ]);
-            if (!summaryRes.ok) return;
-            const summary = await summaryRes.json();
-            document.getElementById('metricTotalRooms').textContent = summary.totalRooms || 0;
-            document.getElementById('metricTotalStaff').textContent = summary.totalHousekeepers || 0;
-            document.getElementById('metricCompletedTasks').textContent = summary.completedCleaningTasks || 0;
-            document.getElementById('metricPendingTasks').textContent = `${summary.inProgressCleaningTasks || 0} active / ${summary.pendingCleaningTasks || 0} queued`;
-
-            if (turnRes.ok) {
-                const turnList = await turnRes.json();
-                const finished = turnList.filter(t => t.turnaroundMinutes !== null);
-                if (finished.length > 0) {
-                    const avg = finished.reduce((acc, t) => acc + t.turnaroundMinutes, 0) / finished.length;
-                    document.getElementById('metricAvgTurnaround').textContent = avg.toFixed(1) + ' min';
-                } else {
-                    document.getElementById('metricAvgTurnaround').textContent = 'N/A';
-                }
-            }
-        } catch (err) {
-            console.error('Error loading metrics:', err);
+        // Show temporary alert banner
+        function showAlert(message, isError = false) {
+            const banner = document.getElementById('alertBanner');
+            banner.className = isError ? 'alert-danger' : 'alert-success';
+            banner.textContent = message;
+            banner.style.display = 'block';
+            setTimeout(() => { banner.style.display = 'none'; }, 6000);
         }
-    }
 
-    // 2. Load Rooms
-    async function loadRooms() {
-        const tbody = document.getElementById('roomsTableBody');
-        try {
-            const res = await fetch(`${API_BASE}/rooms`);
-            if (!res.ok) throw new Error('Failed to fetch rooms');
-            const rooms = await res.json();
-            
-            // Update room breakdown in metric card
-            const counts = {};
-            rooms.forEach(r => { counts[r.status] = (counts[r.status] || 0) + 1; });
-            const breakdownStr = Object.keys(counts).map(k => `${k}: ${counts[k]}`).join(', ');
-            document.getElementById('metricRoomBreakdown').textContent = breakdownStr || 'No rooms registered';
+        // Refresh all data
+        async function refreshAll() {
+            await Promise.all([
+                loadSummaryMetrics(),
+                loadRooms(),
+                loadTasks(),
+                loadStaff(),
+                loadInspections()
+            ]);
+        }
 
-            if (rooms.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No rooms found. Add a room above.</td></tr>';
-                return;
+        // 1. Load Metrics
+        async function loadSummaryMetrics() {
+            try {
+                const [summaryRes, turnRes] = await Promise.all([
+                    fetch(`${API_BASE}/metrics/summary`),
+                    fetch(`${API_BASE}/metrics/room-turnaround`)
+                ]);
+                if (!summaryRes.ok) return;
+                const summary = await summaryRes.json();
+                document.getElementById('metricTotalRooms').textContent = summary.totalRooms || 0;
+                document.getElementById('metricTotalStaff').textContent = summary.totalHousekeepers || 0;
+                document.getElementById('metricCompletedTasks').textContent = summary.completedCleaningTasks || 0;
+                document.getElementById('metricPendingTasks').textContent = `${summary.inProgressCleaningTasks || 0} active / ${summary.pendingCleaningTasks || 0} queued`;
+
+                if (turnRes.ok) {
+                    const turnList = await turnRes.json();
+                    const finished = turnList.filter(t => t.turnaroundMinutes !== null);
+                    if (finished.length > 0) {
+                        const avg = finished.reduce((acc, t) => acc + t.turnaroundMinutes, 0) / finished.length;
+                        document.getElementById('metricAvgTurnaround').textContent = avg.toFixed(1) + ' min';
+                    } else {
+                        document.getElementById('metricAvgTurnaround').textContent = 'N/A';
+                    }
+                }
+            } catch (err) {
+                console.error('Error loading metrics:', err);
             }
+        }
 
-            tbody.innerHTML = rooms.map(r => {
-                const statusClass = `badge-${r.status.toLowerCase()}`;
-                let timeline = [];
-                if (r.dirtyAt) timeline.push(`Dirty: ${formatTime(r.dirtyAt)}`);
-                if (r.readyAt) timeline.push(`Ready: ${formatTime(r.readyAt)}`);
-                const timelineStr = timeline.length > 0 ? timeline.join(' | ') : 'Newly Registered';
+        // 2. Load Rooms
+        async function loadRooms() {
+            const tbody = document.getElementById('roomsTableBody');
+            try {
+                const res = await fetch(`${API_BASE}/rooms`);
+                if (!res.ok) throw new Error('Failed to fetch rooms');
+                const rooms = await res.json();
 
-                let actionButtons = '';
-                if (r.status === 'READY') {
-                    actionButtons = `<button class="btn-sm btn-green" onclick="checkInRoom(${r.id})">Guest Check-In</button>`;
-                } else if (r.status === 'OCCUPIED') {
-                    actionButtons = `<button class="btn-sm btn-orange" onclick="checkoutRoom(${r.id})">Guest Checkout</button>`;
-                } else if (r.status === 'CLEANED') {
-                    actionButtons = `<button class="btn-sm btn-purple" onclick="openInspectionModal(${r.id}, '${r.roomNumber}')">Inspect Room</button>`;
-                } else if (r.status === 'INSPECTED') {
-                    actionButtons = `
+                // Update room breakdown in metric card
+                const counts = {};
+                rooms.forEach(r => { counts[r.status] = (counts[r.status] || 0) + 1; });
+                const breakdownStr = Object.keys(counts).map(k => `${k}: ${counts[k]}`).join(', ');
+                document.getElementById('metricRoomBreakdown').textContent = breakdownStr || 'No rooms registered';
+
+                if (rooms.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No rooms found. Add a room above.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = rooms.map(r => {
+                    const statusClass = `badge-${r.status.toLowerCase()}`;
+                    let timeline = [];
+                    if (r.dirtyAt) timeline.push(`Dirty: ${formatTime(r.dirtyAt)}`);
+                    if (r.readyAt) timeline.push(`Ready: ${formatTime(r.readyAt)}`);
+                    const timelineStr = timeline.length > 0 ? timeline.join(' | ') : 'Newly Registered';
+
+                    let actionButtons = '';
+                    if (r.status === 'READY') {
+                        actionButtons = `<button class="btn-sm btn-green" onclick="checkInRoom(${r.id})">Guest Check-In</button>`;
+                    } else if (r.status === 'OCCUPIED') {
+                        actionButtons = `<button class="btn-sm btn-orange" onclick="checkoutRoom(${r.id})">Guest Checkout</button>`;
+                    } else if (r.status === 'CLEANED') {
+                        actionButtons = `<button class="btn-sm btn-purple" onclick="openInspectionModal(${r.id}, '${r.roomNumber}')">Inspect Room</button>`;
+                    } else if (r.status === 'INSPECTED') {
+                        actionButtons = `
                         <button class="btn-sm btn-green" onclick="markRoomReady(${r.id})">Mark READY</button>
                         <button class="btn-sm btn-red" onclick="sendBackToCleaning(${r.id})">Send to Cleaning</button>
                     `;
-                } else if (r.status === 'DIRTY' || r.status === 'IN_CLEANING') {
-                    actionButtons = `
+                    } else if (r.status === 'DIRTY' || r.status === 'IN_CLEANING') {
+                        actionButtons = `
                         <button class="btn-sm" style="background:#888;" onclick="checkInRoom(${r.id})" title="Will test barrier invariant">Test Check-In</button>
                     `;
-                }
+                    }
 
-                return `
+                    return `
                     <tr>
                         <td>${r.id}</td>
                         <td><strong>Room ${r.roomNumber}</strong></td>
@@ -650,111 +729,111 @@
                         <td>${actionButtons}</td>
                     </tr>
                 `;
-            }).join('');
-        } catch (err) {
-            tbody.innerHTML = `<tr><td colspan="6" style="color:red; text-align:center;">Error: ${err.message}</td></tr>`;
-        }
-    }
-
-    // Create Room
-    async function createRoom(e) {
-        e.preventDefault();
-        const roomNumber = document.getElementById('newRoomNumber').value.trim();
-        const roomType = document.getElementById('newRoomType').value;
-        try {
-            const res = await fetch(`${API_BASE}/rooms`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ roomNumber, roomType })
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.message || 'Failed to add room');
-            showAlert(`Room ${data.roomNumber} created successfully! (Status: ${data.status})`);
-            document.getElementById('newRoomNumber').value = '';
-            refreshAll();
-        } catch (err) {
-            showAlert(err.message, true);
-        }
-    }
-
-    // Room Actions
-    async function checkInRoom(id) {
-        try {
-            const res = await fetch(`${API_BASE}/rooms/${id}/check-in`, { method: 'POST' });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.message || 'Check-in failed');
-            showAlert(`Room ${data.roomNumber} checked in successfully! (Status: ${data.status})`);
-            refreshAll();
-        } catch (err) {
-            showAlert(`Check-in Blocked: ${err.message}`, true);
-        }
-    }
-
-    async function checkoutRoom(id) {
-        try {
-            const res = await fetch(`${API_BASE}/rooms/${id}/checkout`, { method: 'POST' });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.message || 'Checkout failed');
-            showAlert(`Room ${data.roomNumber} checked out! Cleaning task auto-generated. (Status: ${data.status})`);
-            refreshAll();
-        } catch (err) {
-            showAlert(err.message, true);
-        }
-    }
-
-    async function markRoomReady(id) {
-        try {
-            const res = await fetch(`${API_BASE}/rooms/${id}/ready`, { method: 'POST' });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.message || 'Failed to mark ready');
-            showAlert(`Room ${data.roomNumber} is now marked READY for check-in!`);
-            refreshAll();
-        } catch (err) {
-            showAlert(err.message, true);
-        }
-    }
-
-    async function sendBackToCleaning(id) {
-        const reason = prompt('Enter reason for sending back to cleaning:', 'Improper work noted during final check');
-        if (reason === null) return;
-        try {
-            const res = await fetch(`${API_BASE}/rooms/${id}/send-to-cleaning?reason=${encodeURIComponent(reason)}&supervisorName=Supervisor`, { method: 'POST' });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.message || 'Failed to send back');
-            showAlert(`Room ${data.roomNumber} returned to DIRTY. High-priority cleaning task regenerated!`);
-            refreshAll();
-        } catch (err) {
-            showAlert(err.message, true);
-        }
-    }
-
-    // 3. Load Tasks
-    async function loadTasks() {
-        const tbody = document.getElementById('tasksTableBody');
-        try {
-            const res = await fetch(`${API_BASE}/tasks`);
-            if (!res.ok) throw new Error('Failed to load tasks');
-            const tasks = await res.json();
-            if (tasks.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No cleaning tasks recorded.</td></tr>';
-                return;
+                }).join('');
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="6" style="color:red; text-align:center;">Error: ${err.message}</td></tr>`;
             }
+        }
 
-            tbody.innerHTML = tasks.map(t => {
-                const priorityBadge = t.priority === 'HIGH' 
-                    ? '<span class="badge-priority-high">&#9888; HIGH</span>' 
-                    : '<span class="badge-priority-normal">NORMAL</span>';
+        // Create Room
+        async function createRoom(e) {
+            e.preventDefault();
+            const roomNumber = document.getElementById('newRoomNumber').value.trim();
+            const roomType = document.getElementById('newRoomType').value;
+            try {
+                const res = await fetch(`${API_BASE}/rooms`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ roomNumber, roomType })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || 'Failed to add room');
+                showAlert(`Room ${data.roomNumber} created successfully! (Status: ${data.status})`);
+                document.getElementById('newRoomNumber').value = '';
+                refreshAll();
+            } catch (err) {
+                showAlert(err.message, true);
+            }
+        }
 
-                let actionBtn = '-';
-                if (t.status === 'IN_PROGRESS') {
-                    actionBtn = `<button class="btn-sm btn-green" onclick="completeTask(${t.id})">Complete Cleaning</button>`;
-                } else if (t.status === 'PENDING') {
-                    actionBtn = `<span style="color:#d9534f; font-weight:bold; font-size:12px;">Queued (Waiting)</span>`;
-                } else if (t.status === 'COMPLETED') {
-                    actionBtn = `<span style="color:#28a745; font-size:12px;">Done (${formatTime(t.completedAt)})</span>`;
+        // Room Actions
+        async function checkInRoom(id) {
+            try {
+                const res = await fetch(`${API_BASE}/rooms/${id}/check-in`, { method: 'POST' });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || 'Check-in failed');
+                showAlert(`Room ${data.roomNumber} checked in successfully! (Status: ${data.status})`);
+                refreshAll();
+            } catch (err) {
+                showAlert(`Check-in Blocked: ${err.message}`, true);
+            }
+        }
+
+        async function checkoutRoom(id) {
+            try {
+                const res = await fetch(`${API_BASE}/rooms/${id}/checkout`, { method: 'POST' });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || 'Checkout failed');
+                showAlert(`Room ${data.roomNumber} checked out! Cleaning task auto-generated. (Status: ${data.status})`);
+                refreshAll();
+            } catch (err) {
+                showAlert(err.message, true);
+            }
+        }
+
+        async function markRoomReady(id) {
+            try {
+                const res = await fetch(`${API_BASE}/rooms/${id}/ready`, { method: 'POST' });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || 'Failed to mark ready');
+                showAlert(`Room ${data.roomNumber} is now marked READY for check-in!`);
+                refreshAll();
+            } catch (err) {
+                showAlert(err.message, true);
+            }
+        }
+
+        async function sendBackToCleaning(id) {
+            const reason = prompt('Enter reason for sending back to cleaning:', 'Improper work noted during final check');
+            if (reason === null) return;
+            try {
+                const res = await fetch(`${API_BASE}/rooms/${id}/send-to-cleaning?reason=${encodeURIComponent(reason)}&supervisorName=Supervisor`, { method: 'POST' });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || 'Failed to send back');
+                showAlert(`Room ${data.roomNumber} returned to DIRTY. High-priority cleaning task regenerated!`);
+                refreshAll();
+            } catch (err) {
+                showAlert(err.message, true);
+            }
+        }
+
+        // 3. Load Tasks
+        async function loadTasks() {
+            const tbody = document.getElementById('tasksTableBody');
+            try {
+                const res = await fetch(`${API_BASE}/tasks`);
+                if (!res.ok) throw new Error('Failed to load tasks');
+                const tasks = await res.json();
+                if (tasks.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No cleaning tasks recorded.</td></tr>';
+                    return;
                 }
 
-                return `
+                tbody.innerHTML = tasks.map(t => {
+                    const priorityBadge = t.priority === 'HIGH'
+                        ? '<span class="badge-priority-high">&#9888; HIGH</span>'
+                        : '<span class="badge-priority-normal">NORMAL</span>';
+
+                    let actionBtn = '-';
+                    if (t.status === 'IN_PROGRESS') {
+                        actionBtn = `<button class="btn-sm btn-green" onclick="completeTask(${t.id})">Complete Cleaning</button>`;
+                    } else if (t.status === 'PENDING') {
+                        actionBtn = `<span style="color:#d9534f; font-weight:bold; font-size:12px;">Queued (Waiting)</span>`;
+                    } else if (t.status === 'COMPLETED') {
+                        actionBtn = `<span style="color:#28a745; font-size:12px;">Done (${formatTime(t.completedAt)})</span>`;
+                    }
+
+                    return `
                     <tr>
                         <td>${t.id}</td>
                         <td><strong>Room ${t.roomNumber}</strong></td>
@@ -765,73 +844,73 @@
                         <td>${actionBtn}</td>
                     </tr>
                 `;
-            }).join('');
-        } catch (err) {
-            tbody.innerHTML = `<tr><td colspan="7" style="color:red; text-align:center;">Error: ${err.message}</td></tr>`;
-        }
-    }
-
-    async function completeTask(id) {
-        try {
-            const res = await fetch(`${API_BASE}/tasks/${id}/complete`, { method: 'POST' });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.message || 'Failed to complete task');
-            showAlert(`Task ${id} completed! Room ${data.roomNumber} is now CLEANED.`);
-            refreshAll();
-        } catch (err) {
-            showAlert(err.message, true);
-        }
-    }
-
-    async function triggerQueueDispatch() {
-        try {
-            const res = await fetch(`${API_BASE}/tasks/dispatch`, { method: 'POST' });
-            if (!res.ok) throw new Error('Dispatch trigger failed');
-            showAlert('Priority dispatch triggered successfully!');
-            refreshAll();
-        } catch (err) {
-            showAlert(err.message, true);
-        }
-    }
-
-    // 4. Load Housekeepers
-    async function loadStaff() {
-        const tbody = document.getElementById('staffTableBody');
-        try {
-            const [staffRes, workRes] = await Promise.all([
-                fetch(`${API_BASE}/housekeepers`),
-                fetch(`${API_BASE}/metrics/housekeepers`)
-            ]);
-            if (!staffRes.ok) throw new Error('Failed to load staff');
-            const staffList = await staffRes.json();
-            const workloads = workRes.ok ? await workRes.json() : [];
-            const workMap = {};
-            workloads.forEach(w => { workMap[w.housekeeperId] = w; });
-
-            const availCount = staffList.filter(s => s.status === 'AVAILABLE').length;
-            document.getElementById('metricStaffAvailable').textContent = `${availCount} Available`;
-
-            if (staffList.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No housekeeping staff registered. Add staff above.</td></tr>';
-                return;
+                }).join('');
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="7" style="color:red; text-align:center;">Error: ${err.message}</td></tr>`;
             }
+        }
 
-            tbody.innerHTML = staffList.map(s => {
-                const w = workMap[s.id] || {};
-                const avgMin = w.avgTurnaroundMinutes !== null && w.avgTurnaroundMinutes !== undefined 
-                    ? `${w.avgTurnaroundMinutes.toFixed(1)} min` 
-                    : 'N/A';
+        async function completeTask(id) {
+            try {
+                const res = await fetch(`${API_BASE}/tasks/${id}/complete`, { method: 'POST' });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || 'Failed to complete task');
+                showAlert(`Task ${id} completed! Room ${data.roomNumber} is now CLEANED.`);
+                refreshAll();
+            } catch (err) {
+                showAlert(err.message, true);
+            }
+        }
 
-                let toggleBtn = '';
-                if (s.status === 'AVAILABLE') {
-                    toggleBtn = `<button class="btn-sm btn-orange" onclick="updateStaffStatus(${s.id}, 'OFFLINE')">Go OFFLINE</button>`;
-                } else if (s.status === 'OFFLINE') {
-                    toggleBtn = `<button class="btn-sm btn-green" onclick="updateStaffStatus(${s.id}, 'AVAILABLE')">Go AVAILABLE</button>`;
-                } else if (s.status === 'BUSY') {
-                    toggleBtn = `<span style="font-size:12px; color:#e36a05;">Busy on task</span>`;
+        async function triggerQueueDispatch() {
+            try {
+                const res = await fetch(`${API_BASE}/tasks/dispatch`, { method: 'POST' });
+                if (!res.ok) throw new Error('Dispatch trigger failed');
+                showAlert('Priority dispatch triggered successfully!');
+                refreshAll();
+            } catch (err) {
+                showAlert(err.message, true);
+            }
+        }
+
+        // 4. Load Housekeepers
+        async function loadStaff() {
+            const tbody = document.getElementById('staffTableBody');
+            try {
+                const [staffRes, workRes] = await Promise.all([
+                    fetch(`${API_BASE}/housekeepers`),
+                    fetch(`${API_BASE}/metrics/housekeepers`)
+                ]);
+                if (!staffRes.ok) throw new Error('Failed to load staff');
+                const staffList = await staffRes.json();
+                const workloads = workRes.ok ? await workRes.json() : [];
+                const workMap = {};
+                workloads.forEach(w => { workMap[w.housekeeperId] = w; });
+
+                const availCount = staffList.filter(s => s.status === 'AVAILABLE').length;
+                document.getElementById('metricStaffAvailable').textContent = `${availCount} Available`;
+
+                if (staffList.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No housekeeping staff registered. Add staff above.</td></tr>';
+                    return;
                 }
 
-                return `
+                tbody.innerHTML = staffList.map(s => {
+                    const w = workMap[s.id] || {};
+                    const avgMin = w.avgTurnaroundMinutes !== null && w.avgTurnaroundMinutes !== undefined
+                        ? `${w.avgTurnaroundMinutes.toFixed(1)} min`
+                        : 'N/A';
+
+                    let toggleBtn = '';
+                    if (s.status === 'AVAILABLE') {
+                        toggleBtn = `<button class="btn-sm btn-orange" onclick="updateStaffStatus(${s.id}, 'OFFLINE')">Go OFFLINE</button>`;
+                    } else if (s.status === 'OFFLINE') {
+                        toggleBtn = `<button class="btn-sm btn-green" onclick="updateStaffStatus(${s.id}, 'AVAILABLE')">Go AVAILABLE</button>`;
+                    } else if (s.status === 'BUSY') {
+                        toggleBtn = `<span style="font-size:12px; color:#e36a05;">Busy on task</span>`;
+                    }
+
+                    return `
                     <tr>
                         <td>${s.id}</td>
                         <td><strong>${s.name}</strong></td>
@@ -843,69 +922,69 @@
                         <td>${toggleBtn}</td>
                     </tr>
                 `;
-            }).join('');
-        } catch (err) {
-            tbody.innerHTML = `<tr><td colspan="8" style="color:red; text-align:center;">Error: ${err.message}</td></tr>`;
-        }
-    }
-
-    async function createHousekeeper(e) {
-        e.preventDefault();
-        const name = document.getElementById('staffName').value.trim();
-        const email = document.getElementById('staffEmail').value.trim();
-        const phone = document.getElementById('staffPhone').value.trim();
-        try {
-            const res = await fetch(`${API_BASE}/housekeepers`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, phone })
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.message || 'Failed to add staff');
-            showAlert(`Housekeeper ${data.name} registered! Any queued tasks will be auto-assigned.`);
-            document.getElementById('staffName').value = '';
-            document.getElementById('staffEmail').value = '';
-            document.getElementById('staffPhone').value = '';
-            refreshAll();
-        } catch (err) {
-            showAlert(err.message, true);
-        }
-    }
-
-    async function updateStaffStatus(id, newStatus) {
-        try {
-            const res = await fetch(`${API_BASE}/housekeepers/${id}/status`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: newStatus })
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.message || 'Failed to update status');
-            showAlert(`Staff status updated to ${data.status}.`);
-            refreshAll();
-        } catch (err) {
-            showAlert(err.message, true);
-        }
-    }
-
-    // 5. Load Inspections
-    async function loadInspections() {
-        const tbody = document.getElementById('inspectionsTableBody');
-        try {
-            const res = await fetch(`${API_BASE}/inspections`);
-            if (!res.ok) throw new Error('Failed to load inspections');
-            const list = await res.json();
-            if (list.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No inspections recorded yet.</td></tr>';
-                return;
+                }).join('');
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="8" style="color:red; text-align:center;">Error: ${err.message}</td></tr>`;
             }
+        }
 
-            tbody.innerHTML = list.map(i => {
-                const isPassed = i.result === 'PASSED';
-                const badge = isPassed 
-                    ? '<span class="badge badge-ready">&#10004; PASSED</span>' 
-                    : '<span class="badge badge-dirty">&#10008; FAILED</span>';
-                return `
+        async function createHousekeeper(e) {
+            e.preventDefault();
+            const name = document.getElementById('staffName').value.trim();
+            const email = document.getElementById('staffEmail').value.trim();
+            const phone = document.getElementById('staffPhone').value.trim();
+            try {
+                const res = await fetch(`${API_BASE}/housekeepers`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, phone })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || 'Failed to add staff');
+                showAlert(`Housekeeper ${data.name} registered! Any queued tasks will be auto-assigned.`);
+                document.getElementById('staffName').value = '';
+                document.getElementById('staffEmail').value = '';
+                document.getElementById('staffPhone').value = '';
+                refreshAll();
+            } catch (err) {
+                showAlert(err.message, true);
+            }
+        }
+
+        async function updateStaffStatus(id, newStatus) {
+            try {
+                const res = await fetch(`${API_BASE}/housekeepers/${id}/status`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || 'Failed to update status');
+                showAlert(`Staff status updated to ${data.status}.`);
+                refreshAll();
+            } catch (err) {
+                showAlert(err.message, true);
+            }
+        }
+
+        // 5. Load Inspections
+        async function loadInspections() {
+            const tbody = document.getElementById('inspectionsTableBody');
+            try {
+                const res = await fetch(`${API_BASE}/inspections`);
+                if (!res.ok) throw new Error('Failed to load inspections');
+                const list = await res.json();
+                if (list.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No inspections recorded yet.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = list.map(i => {
+                    const isPassed = i.result === 'PASSED';
+                    const badge = isPassed
+                        ? '<span class="badge badge-ready">&#10004; PASSED</span>'
+                        : '<span class="badge badge-dirty">&#10008; FAILED</span>';
+                    return `
                     <tr>
                         <td>${i.id}</td>
                         <td><strong>Room ${i.roomNumber}</strong></td>
@@ -915,84 +994,85 @@
                         <td>${formatTime(i.inspectedAt)}</td>
                     </tr>
                 `;
-            }).join('');
-        } catch (err) {
-            tbody.innerHTML = `<tr><td colspan="6" style="color:red; text-align:center;">Error: ${err.message}</td></tr>`;
-        }
-    }
-
-    // Inspection Modal Logic
-    function openInspectionModal(roomId, roomNumber) {
-        document.getElementById('modalRoomId').value = roomId;
-        document.getElementById('modalRoomNumber').textContent = roomNumber;
-        document.getElementById('modalInspectionResult').value = 'PASSED';
-        document.getElementById('modalComments').value = '';
-        toggleInspectionResultUI();
-        document.getElementById('inspectionModal').style.display = 'flex';
-    }
-
-    function closeInspectionModal() {
-        document.getElementById('inspectionModal').style.display = 'none';
-    }
-
-    function toggleInspectionResultUI() {
-        const res = document.getElementById('modalInspectionResult').value;
-        const btn = document.getElementById('modalSubmitBtn');
-        if (res === 'PASSED') {
-            btn.className = 'btn-green';
-            btn.textContent = 'Submit PASSED';
-            document.getElementById('modalCommentsLabel').textContent = 'Approval Remarks (Optional):';
-        } else {
-            btn.className = 'btn-red';
-            btn.textContent = 'Submit FAILED (Re-clean)';
-            document.getElementById('modalCommentsLabel').textContent = 'Defect Reason (Required for re-cleaning):';
-        }
-    }
-
-    async function submitInspection(e) {
-        e.preventDefault();
-        const roomId = document.getElementById('modalRoomId').value;
-        const supervisorName = document.getElementById('modalSupervisorName').value.trim();
-        const result = document.getElementById('modalInspectionResult').value;
-        const comments = document.getElementById('modalComments').value.trim();
-
-        if (result === 'FAILED' && !comments) {
-            alert('Please specify the defect reason so the housekeeping team knows what to fix.');
-            return;
-        }
-
-        try {
-            const res = await fetch(`${API_BASE}/rooms/${roomId}/inspections`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ supervisorName, result, comments })
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.message || 'Inspection failed');
-            closeInspectionModal();
-            if (result === 'PASSED') {
-                showAlert(`Inspection PASSED for Room ${data.roomNumber}. Status moved to INSPECTED (ready to be marked READY).`);
-            } else {
-                showAlert(`Inspection FAILED for Room ${data.roomNumber}. Status reverted to DIRTY with HIGH-priority re-cleaning task!`, true);
+                }).join('');
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="6" style="color:red; text-align:center;">Error: ${err.message}</td></tr>`;
             }
-            refreshAll();
-        } catch (err) {
-            showAlert(err.message, true);
         }
-    }
 
-    function formatTime(isoStr) {
-        if (!isoStr) return '-';
-        const d = new Date(isoStr);
-        return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    }
+        // Inspection Modal Logic
+        function openInspectionModal(roomId, roomNumber) {
+            document.getElementById('modalRoomId').value = roomId;
+            document.getElementById('modalRoomNumber').textContent = roomNumber;
+            document.getElementById('modalInspectionResult').value = 'PASSED';
+            document.getElementById('modalComments').value = '';
+            toggleInspectionResultUI();
+            document.getElementById('inspectionModal').style.display = 'flex';
+        }
 
-    // Initial Load & Auto-polling every 12 seconds
-    window.addEventListener('DOMContentLoaded', () => {
-        refreshAll();
-        setInterval(refreshAll, 12000);
-    });
-</script>
+        function closeInspectionModal() {
+            document.getElementById('inspectionModal').style.display = 'none';
+        }
+
+        function toggleInspectionResultUI() {
+            const res = document.getElementById('modalInspectionResult').value;
+            const btn = document.getElementById('modalSubmitBtn');
+            if (res === 'PASSED') {
+                btn.className = 'btn-green';
+                btn.textContent = 'Submit PASSED';
+                document.getElementById('modalCommentsLabel').textContent = 'Approval Remarks (Optional):';
+            } else {
+                btn.className = 'btn-red';
+                btn.textContent = 'Submit FAILED (Re-clean)';
+                document.getElementById('modalCommentsLabel').textContent = 'Defect Reason (Required for re-cleaning):';
+            }
+        }
+
+        async function submitInspection(e) {
+            e.preventDefault();
+            const roomId = document.getElementById('modalRoomId').value;
+            const supervisorName = document.getElementById('modalSupervisorName').value.trim();
+            const result = document.getElementById('modalInspectionResult').value;
+            const comments = document.getElementById('modalComments').value.trim();
+
+            if (result === 'FAILED' && !comments) {
+                alert('Please specify the defect reason so the housekeeping team knows what to fix.');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/rooms/${roomId}/inspections`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ supervisorName, result, comments })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || 'Inspection failed');
+                closeInspectionModal();
+                if (result === 'PASSED') {
+                    showAlert(`Inspection PASSED for Room ${data.roomNumber}. Status moved to INSPECTED (ready to be marked READY).`);
+                } else {
+                    showAlert(`Inspection FAILED for Room ${data.roomNumber}. Status reverted to DIRTY with HIGH-priority re-cleaning task!`, true);
+                }
+                refreshAll();
+            } catch (err) {
+                showAlert(err.message, true);
+            }
+        }
+
+        function formatTime(isoStr) {
+            if (!isoStr) return '-';
+            const d = new Date(isoStr);
+            return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+
+        // Initial Load & Auto-polling every 12 seconds
+        window.addEventListener('DOMContentLoaded', () => {
+            refreshAll();
+            setInterval(refreshAll, 12000);
+        });
+    </script>
 
 </body>
+
 </html>

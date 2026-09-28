@@ -1,0 +1,9 @@
+1.[/boost](slashCommand;boost)  [/plan](slashCommand;plan)  refer agent.txt
+2.[command injected during generation]ensure code quality and naming schemes and the architectural designs
+3.also the failed room gets a priority when a new worker is available 
+4.also high priority for longest wait rooms
+.
+.
+.
+.
+create a frontend that connects to this backend .use html,css,js.make it a simpler ui similar to this  <pastedpath>
