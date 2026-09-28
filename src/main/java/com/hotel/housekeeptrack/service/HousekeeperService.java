@@ -1,0 +1,115 @@
+package com.hotel.housekeeptrack.service;
+
+import com.hotel.housekeeptrack.dto.CreateHousekeeperRequest;
+import com.hotel.housekeeptrack.exception.BusinessRuleException;
+import com.hotel.housekeeptrack.exception.ResourceNotFoundException;
+import com.hotel.housekeeptrack.model.CleaningTask;
+import com.hotel.housekeeptrack.model.Housekeeper;
+import com.hotel.housekeeptrack.model.HousekeeperStatus;
+import com.hotel.housekeeptrack.model.Room;
+import com.hotel.housekeeptrack.model.RoomStatus;
+import com.hotel.housekeeptrack.model.TaskStatus;
+import com.hotel.housekeeptrack.repository.CleaningTaskRepository;
+import com.hotel.housekeeptrack.repository.HousekeeperRepository;
+import com.hotel.housekeeptrack.repository.RoomRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+/**
+ * Service managing housekeeper staff members and availability transitions.
+ */
+@Service
+public class HousekeeperService {
+
+    private final HousekeeperRepository housekeeperRepository;
+    private final CleaningTaskService cleaningTaskService;
+    private final CleaningTaskRepository cleaningTaskRepository;
+    private final RoomRepository roomRepository;
+
+    public HousekeeperService(HousekeeperRepository housekeeperRepository,
+                              CleaningTaskService cleaningTaskService,
+                              CleaningTaskRepository cleaningTaskRepository,
+                              RoomRepository roomRepository) {
+        this.housekeeperRepository = housekeeperRepository;
+        this.cleaningTaskService = cleaningTaskService;
+        this.cleaningTaskRepository = cleaningTaskRepository;
+        this.roomRepository = roomRepository;
+    }
+
+    @Transactional
+    public Housekeeper createHousekeeper(CreateHousekeeperRequest request) {
+        if (housekeeperRepository.existsByEmail(request.getEmail())) {
+            throw new BusinessRuleException("Housekeeper with email " + request.getEmail() + " already exists.");
+        }
+        Housekeeper housekeeper = new Housekeeper(request.getName(), request.getEmail(), request.getPhone());
+        housekeeper = housekeeperRepository.save(housekeeper);
+
+        // If newly added housekeeper is available, dispatch any existing pending tasks
+        cleaningTaskService.dispatchToAvailableHousekeepers();
+
+        return housekeeper;
+    }
+
+    public List<Housekeeper> getAllHousekeepers() {
+        return housekeeperRepository.findAll();
+    }
+
+    public Housekeeper getHousekeeperById(Long id) {
+        return housekeeperRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Housekeeper not found with ID: " + id));
+    }
+
+    public List<Housekeeper> getHousekeepersByStatus(HousekeeperStatus status) {
+        return housekeeperRepository.findByStatus(status);
+    }
+
+    /**
+     * Updates housekeeper status.
+     * - If transitioning to OFFLINE: re-queues any active IN_PROGRESS tasks back to PENDING,
+     *   reverts room status to DIRTY, resets staff active task count, and triggers queue dispatch.
+     * - If transitioning to AVAILABLE: verifies no active tasks are ongoing, then triggers queue dispatch.
+     */
+    @Transactional
+    public Housekeeper updateStatus(Long id, HousekeeperStatus status) {
+        Housekeeper housekeeper = getHousekeeperById(id);
+
+        if (status == HousekeeperStatus.OFFLINE) {
+            // Re-queue active tasks so rooms are not abandoned or stuck
+            List<CleaningTask> activeTasks = cleaningTaskRepository.findByHousekeeperIdAndStatus(housekeeper.getId(), TaskStatus.IN_PROGRESS);
+            for (CleaningTask task : activeTasks) {
+                task.setStatus(TaskStatus.PENDING);
+                task.setHousekeeper(null);
+                task.setAssignedAt(null);
+                task.setStartedAt(null);
+                cleaningTaskRepository.save(task);
+
+                Room room = task.getRoom();
+                room.setStatus(RoomStatus.DIRTY);
+                roomRepository.save(room);
+            }
+
+            housekeeper.setStatus(HousekeeperStatus.OFFLINE);
+            housekeeper.setActiveTaskCount(0);
+            housekeeper = housekeeperRepository.save(housekeeper);
+
+            // Re-dispatch orphaned tasks to other available staff
+            cleaningTaskService.dispatchToAvailableHousekeepers();
+            return housekeeper;
+        }
+
+        if (status == HousekeeperStatus.AVAILABLE) {
+            if (housekeeper.getActiveTaskCount() != null && housekeeper.getActiveTaskCount() > 0) {
+                throw new BusinessRuleException("Cannot set housekeeper to AVAILABLE while they have active cleaning tasks in progress.");
+            }
+            housekeeper.setStatus(HousekeeperStatus.AVAILABLE);
+            housekeeper = housekeeperRepository.save(housekeeper);
+            cleaningTaskService.dispatchToAvailableHousekeepers();
+            return housekeeper;
+        }
+
+        housekeeper.setStatus(status);
+        return housekeeperRepository.save(housekeeper);
+    }
+}

@@ -49,23 +49,28 @@ for plan mode design architecture first and report the contadictions,important p
      * Housekeeper (1) -> (M) CleaningTask
      * Room: id, roomNumber, roomType, status [DIRTY, IN_CLEANING, CLEANED, INSPECTED, READY, OCCUPIED], activeCleaningTaskId, dirtyAt, readyAt.
      * Housekeeper: id, name, email, phone, status [AVAILABLE, BUSY, OFFLINE], activeTaskCount.
-     * CleaningTask: id, room_id, housekeeper_id, status [PENDING, IN_PROGRESS, COMPLETED, CANCELLED], assignedAt, startedAt, completedAt, notes.
+     * CleaningTask: id, room_id, housekeeper_id, status [PENDING, IN_PROGRESS, COMPLETED, CANCELLED], priority [HIGH, NORMAL], assignedAt, startedAt, completedAt, notes.
      * Inspection: id, room_id, supervisorName, result [PASSED, FAILED], failureReason, inspectedAt.
 
 2. Contradictions & Ambiguities Resolved (User Feedback Incorporated):
-   - Dual-Path Inspection Lifecycle:
+   - Dual-Path Inspection Lifecycle & Priority Re-cleaning:
      * Room lifecycle: DIRTY -> IN_CLEANING -> CLEANED -> INSPECTED -> (READY or DIRTY).
      * When a supervisor inspects a CLEANED room, it transitions to INSPECTED with the recorded inspection result.
      * From INSPECTED, there are two distinct paths:
        a) Path 1 (PASSED): Supervisor can transition room to READY (markReady endpoint). Only rooms with PASSED inspection can be marked READY.
-       b) Path 2 (FAILED / Re-cleaning needed): Due to improper works or failed inspection, supervisor sends the room back to cleaning. Room status transitions back to DIRTY, and a new high-priority CleaningTask is auto-generated with failure notes and auto-assigned.
+       b) Path 2 (FAILED / Re-cleaning needed): Due to improper works or failed inspection, supervisor sends the room back to cleaning. Room status transitions back to DIRTY, and a new HIGH-PRIORITY CleaningTask is auto-generated with failure notes and auto-assigned.
      * Crucially: INSPECTED is a necessary intermediate stage; markReady is not the only path for INSPECTED.
-   - Auto-assignment Queuing:
-     * Approved: When no housekeeper is available, the CleaningTask status is set to PENDING (queued). As soon as any housekeeper finishes their current task, the system auto-assigns the oldest pending task.
+   - Priority-based Auto-assignment Queuing:
+     * When a housekeeper completes a task or becomes available, the system assigns the highest-priority pending task first.
+     * Two sources of High Priority:
+       1) Inspection-failed rooms: assigned HIGH priority immediately to rectify defects quickly.
+       2) Longest-wait rooms: pending tasks are dynamically escalated to HIGH priority or ordered by longest wait time (oldest dirtyAt/assignedAt), ensuring rooms that have waited the longest are prioritized and never starved.
+     * Dispatch Order: HIGH priority tasks (failed rooms + longest-waiting escalated rooms) dispatched first, ordered by oldest wait time (FIFO within priority band).
    - Turnaround Time:
      * Track both cleaning turnaround time per housekeeper (startedAt to completedAt) and total room turnaround time (dirtyAt to readyAt).
 
 3. Important Points & Business Rules:
+   - Priority Dispatch Invariant: Both inspection-failed rooms and longest-waiting rooms receive high priority in the assignment queue to minimize room downtime and turnaround latency.
    - Service Layer Invariant: A room cannot be allocated/checked-in to a guest unless status is strictly READY.
    - Forward-only Lifecycle with Re-cleaning Loop: Transitions strictly follow the lifecycle. The only permitted regression is from INSPECTED/CLEANED -> DIRTY when inspection fails or re-cleaning is required.
    - Immediate Validation: Invalid transitions must reject requests with HTTP 400 Bad Request / 409 Conflict with descriptive error payloads instead of stack traces or DB errors.
@@ -76,7 +81,41 @@ for plan mode design architecture first and report the contadictions,important p
 
 
 for writemode any issues are design implemented changes report here {
+1. Architectural Implementation (Spring MVC Architecture):
+   - Model Layer:
+     * Domain Entities: Room, Housekeeper, CleaningTask, Inspection mapped via Spring Data JPA / Hibernate.
+     * Repositories: RoomRepository, HousekeeperRepository, CleaningTaskRepository, InspectionRepository.
+     * Business Services: RoomService, HousekeeperService, CleaningTaskService, InspectionService, MetricsService enforcing domain state machine rules, transactional boundaries, and invariants.
+     * Concurrency & Invariants: Optimistic locking (@Version) on Room entity protects against race conditions on concurrent guest check-in / state transitions.
+   - View Layer (RESTful JSON Views & DTOs):
+     * Request DTOs: CreateRoomRequest, CreateHousekeeperRequest, CreateInspectionRequest, UpdateHousekeeperStatusRequest.
+     * Response Models / DTOs: RoomResponse, HousekeeperResponse, CleaningTaskResponse, InspectionResponse, HousekeeperWorkloadDto, RoomTurnaroundDto, SystemSummaryDto, ApiErrorResponse.
+   - Controller Layer (Spring MVC REST Controllers):
+     * Spring MVC REST controllers (@RestController) handling HTTP routing, request validation, and mapping model responses:
+       RoomController, HousekeeperController, CleaningTaskController, InspectionController, MetricsController.
+     * Global Exception Advice: @RestControllerAdvice handling exceptions centrally and returning structured JSON error views.
 
+2. Enforced Business Rules & Invariants:
+   - Check-in Allocation Barrier: Room cannot transition to OCCUPIED unless status is strictly READY. Invalid attempts throw InvalidRoomStateException returning HTTP 400 with clean error message.
+   - Dual-Path Inspection from CLEANED and INSPECTED:
+     * PASSED: Room transitions to INSPECTED, becoming eligible for READY status.
+     * FAILED / Defect Found: Room status reverts to DIRTY, auto-generates a HIGH-priority re-cleaning task with supervisor failure notes, and auto-dispatches.
+     * Crucially: INSPECTED status supports both markReady (Path 1) and send-to-cleaning / failed re-inspection (Path 2) without blocking defects found during final checks.
+   - Mark Ready Invariant: Room must be in INSPECTED status and have passed inspection before moving to READY.
 
+3. Priority Queue, Dynamic Escalation & Auto-Dispatch:
+   - Priority bands: HIGH before NORMAL, then oldest FIFO by assignedAt / createdAt (COALESCE(t.assignedAt, t.createdAt) ASC).
+   - Dynamic escalation: Long-waiting PENDING tasks escalate to HIGH priority after threshold (based on both task creation time and room dirtyAt).
+   - Auto-assignment occurs reactively whenever a task is created, a housekeeper is registered, housekeeper status changes to AVAILABLE, or a task is completed.
+   - Staff Availability Protection: Setting a housekeeper to OFFLINE re-queues active tasks to PENDING, resets room to DIRTY, and immediately dispatches to other available staff so rooms are never stranded. Guard prevents setting BUSY staff to AVAILABLE. Task completion preserves OFFLINE status for clocked-out staff.
 
+4. Metrics & Exception Handling:
+   - Tracks housekeeper workload and average cleaning turnaround time (startedAt -> completedAt).
+   - Tracks room turnaround duration (dirtyAt -> readyAt), correctly supporting zero-duration edge cases and preventing clock drift anomalies.
+   - System summary endpoint delivers aggregate metrics.
+   - GlobalExceptionHandler (@RestControllerAdvice) formats all errors into clean ApiErrorResponse JSON payloads for ResourceNotFoundException, InvalidRoomStateException, BusinessRuleException, MethodArgumentNotValidException, IllegalArgumentException, HttpMessageNotReadableException, MethodArgumentTypeMismatchException, and OptimisticLockingFailureException.
+
+5. Test Verification:
+   - Thorough unit and integration tests across 8 test suites (HouseKeepTrackIntegrationTest, RoomServiceTest, InspectionServiceTest, CleaningTaskServiceTest, HousekeeperServiceTest, MetricsServiceTest, RoomPresenterTest, GlobalExceptionHandlerTest).
+   - Fully covers lifecycle, allocation barrier, failed inspection re-cleaning loop, priority queue dispatch, wait-time escalation, housekeeper offline reassignment, and metrics.
 }
