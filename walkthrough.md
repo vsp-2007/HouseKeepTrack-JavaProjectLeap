@@ -37,19 +37,29 @@ flowchart TD
    - Fine-grained `@CacheEvict(allEntries = true)` on mutating state transitions.
    - Pageable and Sort support on [`RoomRepository`](file:///c:/Users/visnu/Desktop/housekeeptrack/src/main/java/com/hotel/housekeeptrack/repository/RoomRepository.java) and [`RoomController`](file:///c:/Users/visnu/Desktop/housekeeptrack/src/main/java/com/hotel/housekeeptrack/controller/RoomController.java).
 
-4. **Frontend UI Enhancements ([`index.html`](file:///c:/Users/visnu/Desktop/housekeeptrack/src/main/resources/static/index.html))**:
-   - **Single Download Button**: "📥 Download Audit Logs" in portal header and Audit section, launching a format picker modal asking for Markdown (.md) or Plain Text (.txt) before downloading.
-   - **5-Item Table Pagination**: All tables (Rooms, Tasks, Staff, Inspections, Audit Trail) paginate with 5 entries per page, showing `« Prev`, numbered page buttons, and `Next »` controls.
-   - **Blinking Page Number Alert**: When an unread change occurs on a page not currently being viewed (room becomes DIRTY, task queued, staff status change, new audit log), that page number button pulses with `@keyframes alertBlinkRedAmber` in red-amber until clicked and viewed.
-   - **Operational Audit Trail Section**: Displays chronological audit log events with action badges, actor, entity ID, and event details.
+4. **Mistake-Handling Revert & Safe Deletion Operations**:
+   - **Single Action Revert (`POST /api/audit-logs/revert-last` & `POST /api/system/revert-last`)**:
+     * Implemented in [`RevertService`](file:///c:/Users/visnu/Desktop/housekeeptrack/src/main/java/com/hotel/housekeeptrack/service/RevertService.java).
+     * Discovers the latest non-reverted action among revertible events (`CHECK_IN`, `CHECKOUT`, `MARK_READY`, `SEND_TO_CLEANING`, `STAFF_STATUS_CHANGED`, `INSPECTION_PASSED`, `INSPECTION_FAILED`).
+     * Reverts the domain entity to its prior state (e.g., OCCUPIED -> READY for check-in; cancels cleaning tasks and restores OCCUPIED for checkout; restores staff status; deletes failed inspection and cancels re-cleaning tasks).
+     * **Resilience & Self-Healing**: Automatically filters out deleted target entities so a deleted room/staff never bricks revert history; properly restores `INSPECTED` status and `PASSED` inspection results for `SEND_TO_CLEANING`; re-queues tasks to `PENDING` when rolling staff to `OFFLINE`; safely resolves rooms for inspections by room number; immediately dispatches pending cleaning tasks whenever staff members are freed.
+     * Records a new audit log entry with action `REVERTED` noting target log ID and summary.
+     * Clears all caches via Spring `CacheManager`.
+     * Frontend UI: "↺ Revert Last Action" button in the header bar and Audit Trail section.
+   - **Safe Deletion Operations (`DELETE /api/...`) with Inline SVG Trash Bin**:
+     * Strict requirement: **No emoji used** (no 🗑️). A clean inline SVG vector icon is embedded inside small red buttons (`.btn-red.btn-sm`).
+     * `DELETE /api/rooms/{id}`: Safely cleans up all associated cleaning tasks (freeing busy housekeepers), deletes inspections, deletes the room entity, records `ROOM_DELETED` in the audit log, evicts caches, and re-dispatches tasks to available housekeepers.
+     * `DELETE /api/housekeepers/{id}`: Safely re-queues active cleaning tasks to `PENDING` (reverting rooms to `DIRTY`), unlinks historical tasks to preserve foreign key constraints, deletes the worker entity, records `STAFF_DELETED`, evicts caches, and re-dispatches tasks.
+     * `DELETE /api/audit-logs/{id}`: Deletes individual action records from the operational audit trail.
+     * Frontend UI: Confirmation dialogs on each Room row, Housekeeper row, and Audit Log row with robust client state resolution.
 
 ---
 
 ## 2. Verification Record
 
 ### Automated Test Suite (`mvn clean test`)
-- **Total Test Suites**: 10
-- **Total Tests Run**: 55
+- **Total Test Suites**: 11
+- **Total Tests Run**: 78
 - **Failures**: 0
 - **Errors**: 0
 - **Skipped**: 0
@@ -57,29 +67,31 @@ flowchart TD
 
 ```text
 [INFO] Running com.hotel.housekeeptrack.controller.AuditLogControllerTest
-[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
 [INFO] Running com.hotel.housekeeptrack.exception.GlobalExceptionHandlerTest
 [INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
 [INFO] Running com.hotel.housekeeptrack.HouseKeepTrackIntegrationTest
-[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Tests run: 13, Failures: 0, Errors: 0, Skipped: 0
 [INFO] Running com.hotel.housekeeptrack.presenter.RoomPresenterTest
 [INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
 [INFO] Running com.hotel.housekeeptrack.service.AuditLogServiceTest
-[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
 [INFO] Running com.hotel.housekeeptrack.service.CleaningTaskServiceTest
 [INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0
 [INFO] Running com.hotel.housekeeptrack.service.HousekeeperServiceTest
-[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0
 [INFO] Running com.hotel.housekeeptrack.service.InspectionServiceTest
 [INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0
 [INFO] Running com.hotel.housekeeptrack.service.MetricsServiceTest
 [INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Running com.hotel.housekeeptrack.service.RevertServiceTest
+[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0
 [INFO] Running com.hotel.housekeeptrack.service.RoomServiceTest
-[INFO] Tests run: 13, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Tests run: 14, Failures: 0, Errors: 0, Skipped: 0
 [INFO] 
 [INFO] Results:
 [INFO] 
-[INFO] Tests run: 55, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Tests run: 78, Failures: 0, Errors: 0, Skipped: 0
 [INFO] BUILD SUCCESS
 ```
 

@@ -330,4 +330,186 @@ class HouseKeepTrackIntegrationTest {
         String txtBody = new String(txtRes.getBody(), java.nio.charset.StandardCharsets.UTF_8);
         assertTrue(txtBody.contains("HOUSEKEEPTRACK - OPERATIONAL AUDIT TRAIL LOG REPORT"));
     }
+
+    @Test
+    @DisplayName("Mistake Handling: Single action revert restores previous entity states and logs REVERTED")
+    void testRevertLastActionLifecycle() {
+        // 1. Create Room 601
+        CreateRoomRequest roomReq = new CreateRoomRequest("601", "DELUXE");
+        long roomId = roomPresenter.presentCreatedRoom(roomReq).getBody().getId();
+        assertEquals(RoomStatus.READY, roomPresenter.presentRoomById(roomId).getBody().getStatus());
+
+        // 2. Check-in Room 601 -> OCCUPIED
+        roomPresenter.presentCheckedInRoom(roomId);
+        assertEquals(RoomStatus.OCCUPIED, roomPresenter.presentRoomById(roomId).getBody().getStatus());
+
+        // 3. Revert last action (CHECK_IN) -> Restores to READY
+        ResponseEntity<RevertActionResponse> revertRes1 = auditLogPresenter.presentRevertLastAction();
+        assertEquals(HttpStatus.OK, revertRes1.getStatusCode());
+        assertEquals(com.hotel.housekeeptrack.model.AuditAction.CHECK_IN, revertRes1.getBody().getRevertedAction());
+        assertEquals(RoomStatus.READY, roomPresenter.presentRoomById(roomId).getBody().getStatus());
+
+        // 4. Check-in again -> OCCUPIED, then Checkout -> DIRTY
+        roomPresenter.presentCheckedInRoom(roomId);
+        roomPresenter.presentCheckedOutRoom(roomId);
+        RoomResponse roomAfterCheckout = roomPresenter.presentRoomById(roomId).getBody();
+        assertTrue(roomAfterCheckout.getStatus() == RoomStatus.DIRTY || roomAfterCheckout.getStatus() == RoomStatus.IN_CLEANING);
+
+        // 5. Revert last action (CHECKOUT) -> Restores to OCCUPIED and cancels cleaning task
+        ResponseEntity<RevertActionResponse> revertRes2 = auditLogPresenter.presentRevertLastAction();
+        assertEquals(HttpStatus.OK, revertRes2.getStatusCode());
+        assertEquals(com.hotel.housekeeptrack.model.AuditAction.CHECKOUT, revertRes2.getBody().getRevertedAction());
+        assertEquals(RoomStatus.OCCUPIED, roomPresenter.presentRoomById(roomId).getBody().getStatus());
+
+        // Verify Audit Log records REVERTED entries
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(0, 10);
+        List<AuditLogResponse> logs = auditLogPresenter.presentAuditLogs(pageable).getBody().getContent();
+        long revertCount = logs.stream().filter(l -> l.getAction() == com.hotel.housekeeptrack.model.AuditAction.REVERTED).count();
+        assertTrue(revertCount >= 2, "Audit log must contain REVERTED records");
+    }
+
+    @Test
+    @DisplayName("Delete Room: Safely deletes room, cascades cleaning tasks and inspections, logs ROOM_DELETED")
+    void testDeleteRoomLifecycle() {
+        // 1. Create Room 602
+        CreateRoomRequest roomReq = new CreateRoomRequest("602", "STANDARD");
+        long roomId = roomPresenter.presentCreatedRoom(roomReq).getBody().getId();
+
+        // 2. Delete Room 602
+        ResponseEntity<Void> deleteRes = roomPresenter.presentDeletedRoom(roomId);
+        assertEquals(HttpStatus.NO_CONTENT, deleteRes.getStatusCode());
+
+        // 3. Fetching deleted room throws ResourceNotFoundException
+        assertThrows(com.hotel.housekeeptrack.exception.ResourceNotFoundException.class, () -> roomPresenter.presentRoomById(roomId));
+
+        // 4. Audit Log records ROOM_DELETED
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(0, 10);
+        List<AuditLogResponse> logs = auditLogPresenter.presentAuditLogs(pageable).getBody().getContent();
+        boolean hasRoomDeleted = logs.stream().anyMatch(l -> l.getAction() == com.hotel.housekeeptrack.model.AuditAction.ROOM_DELETED && l.getEntityId().equals(roomId));
+        assertTrue(hasRoomDeleted, "Audit log should contain ROOM_DELETED");
+    }
+
+    @Test
+    @DisplayName("Delete Housekeeper: Safely deletes worker, re-queues active tasks to PENDING, logs STAFF_DELETED")
+    void testDeleteHousekeeperLifecycle() {
+        // 1. Register Housekeeper Dave
+        CreateHousekeeperRequest hkReq = new CreateHousekeeperRequest("Dave Worker", "dave.worker@hotel.com", "555-7777");
+        long hkId = housekeeperPresenter.presentCreatedHousekeeper(hkReq).getBody().getId();
+
+        // 2. Create room 603, check-in and checkout to start cleaning with Dave
+        CreateRoomRequest roomReq = new CreateRoomRequest("603", "SUITE");
+        long roomId = roomPresenter.presentCreatedRoom(roomReq).getBody().getId();
+        roomPresenter.presentCheckedInRoom(roomId);
+        roomPresenter.presentCheckedOutRoom(roomId);
+
+        // 3. Delete Housekeeper Dave
+        ResponseEntity<Void> deleteRes = housekeeperPresenter.presentDeletedHousekeeper(hkId);
+        assertEquals(HttpStatus.NO_CONTENT, deleteRes.getStatusCode());
+
+        // 4. Dave no longer exists
+        assertThrows(com.hotel.housekeeptrack.exception.ResourceNotFoundException.class, () -> housekeeperPresenter.presentHousekeeperById(hkId));
+
+        // 5. Room 603 is restored to DIRTY and task is re-queued to PENDING
+        RoomResponse room = roomPresenter.presentRoomById(roomId).getBody();
+        assertEquals(RoomStatus.DIRTY, room.getStatus());
+
+        List<CleaningTaskResponse> tasks = cleaningTaskPresenter.presentTasks(roomId, null).getBody();
+        assertFalse(tasks.isEmpty());
+        assertEquals(TaskStatus.PENDING, tasks.get(0).getStatus());
+        assertNull(tasks.get(0).getHousekeeperId());
+
+        // 6. Audit Log records STAFF_DELETED
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(0, 10);
+        List<AuditLogResponse> logs = auditLogPresenter.presentAuditLogs(pageable).getBody().getContent();
+        boolean hasStaffDeleted = logs.stream().anyMatch(l -> l.getAction() == com.hotel.housekeeptrack.model.AuditAction.STAFF_DELETED && l.getEntityId().equals(hkId));
+        assertTrue(hasStaffDeleted, "Audit log should contain STAFF_DELETED");
+    }
+
+    @Test
+    @DisplayName("Delete Audit Log: Safely deletes individual audit log record")
+    void testDeleteAuditLogLifecycle() {
+        // Create Room 604 to produce an audit log entry
+        CreateRoomRequest roomReq = new CreateRoomRequest("604", "STANDARD");
+        roomPresenter.presentCreatedRoom(roomReq);
+
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(0, 10);
+        List<AuditLogResponse> logsBefore = auditLogPresenter.presentAuditLogs(pageable).getBody().getContent();
+        assertFalse(logsBefore.isEmpty());
+        long logIdToDelete = logsBefore.get(0).getId();
+
+        ResponseEntity<Void> deleteRes = auditLogPresenter.presentDeletedAuditLog(logIdToDelete);
+        assertEquals(HttpStatus.NO_CONTENT, deleteRes.getStatusCode());
+
+        // Verify log is deleted
+        List<AuditLogResponse> logsAfter = auditLogPresenter.presentAuditLogs(pageable).getBody().getContent();
+        boolean stillPresent = logsAfter.stream().anyMatch(l -> l.getId().equals(logIdToDelete));
+        assertFalse(stillPresent, "Audit log record should have been deleted");
+    }
+
+    @Test
+    @DisplayName("Mistake Handling: Reverting send-to-cleaning restores room back to INSPECTED and cancels re-cleaning task")
+    void testRevertSendToCleaningRestoresInspectedStatus() {
+        // 1. Create Room 605 and Housekeeper, then advance to INSPECTED
+        CreateRoomRequest roomReq = new CreateRoomRequest("605", "DELUXE");
+        long roomId = roomPresenter.presentCreatedRoom(roomReq).getBody().getId();
+        housekeeperPresenter.presentCreatedHousekeeper(new CreateHousekeeperRequest("Staff Danica", "danica@hotel.com", "555-9988"));
+        roomPresenter.presentCheckedInRoom(roomId);
+        roomPresenter.presentCheckedOutRoom(roomId);
+
+        // Complete cleaning
+        CleaningTaskResponse task = cleaningTaskPresenter.presentTasks(roomId, null).getBody().get(0);
+        cleaningTaskPresenter.presentCompletedTask(task.getId());
+
+        // Pass inspection -> INSPECTED
+        CreateInspectionRequest passReq = new CreateInspectionRequest("Supervisor Dan", InspectionResult.PASSED, null);
+        inspectionPresenter.presentInspection(roomId, passReq);
+        assertEquals(RoomStatus.INSPECTED, roomPresenter.presentRoomById(roomId).getBody().getStatus());
+
+        // 2. Supervisor sends room back to cleaning by mistake
+        roomPresenter.presentSentBackToCleaning(roomId, "Found broken bulb", "Supervisor Dan");
+        RoomResponse roomAfterSend = roomPresenter.presentRoomById(roomId).getBody();
+        assertTrue(roomAfterSend.getStatus() == RoomStatus.DIRTY || roomAfterSend.getStatus() == RoomStatus.IN_CLEANING);
+
+        // 3. Revert last action
+        ResponseEntity<RevertActionResponse> revertRes = auditLogPresenter.presentRevertLastAction();
+        assertEquals(HttpStatus.OK, revertRes.getStatusCode());
+        assertEquals(com.hotel.housekeeptrack.model.AuditAction.SEND_TO_CLEANING, revertRes.getBody().getRevertedAction());
+
+        // 4. Room status is restored to INSPECTED with PASSED inspection result
+        RoomResponse restoredRoom = roomPresenter.presentRoomById(roomId).getBody();
+        assertEquals(RoomStatus.INSPECTED, restoredRoom.getStatus());
+        assertEquals(InspectionResult.PASSED, restoredRoom.getLastInspectionResult());
+
+        // 5. Active cleaning task is cancelled
+        List<CleaningTaskResponse> tasks = cleaningTaskPresenter.presentTasks(roomId, null).getBody();
+        CleaningTaskResponse recleaningTask = tasks.get(tasks.size() - 1);
+        assertEquals(TaskStatus.CANCELLED, recleaningTask.getStatus());
+    }
+
+    @Test
+    @DisplayName("Self-Healing Revert: Reverting skips deleted room and rolls back surviving room")
+    void testDeleteRoomSkipsInRevertToHealEarlierActions() {
+        // 1. Create Room 606 and Room 607
+        CreateRoomRequest room606Req = new CreateRoomRequest("606", "STANDARD");
+        long r606Id = roomPresenter.presentCreatedRoom(room606Req).getBody().getId();
+
+        CreateRoomRequest room607Req = new CreateRoomRequest("607", "STANDARD");
+        long r607Id = roomPresenter.presentCreatedRoom(room607Req).getBody().getId();
+
+        // 2. Check in 606, then check in 607
+        roomPresenter.presentCheckedInRoom(r606Id);
+        roomPresenter.presentCheckedInRoom(r607Id);
+        assertEquals(RoomStatus.OCCUPIED, roomPresenter.presentRoomById(r606Id).getBody().getStatus());
+        assertEquals(RoomStatus.OCCUPIED, roomPresenter.presentRoomById(r607Id).getBody().getStatus());
+
+        // 3. Delete Room 607 (its check-in action is now orphaned)
+        roomPresenter.presentDeletedRoom(r607Id);
+
+        // 4. Revert last action: skips deleted 607, reverts 606 back to READY!
+        ResponseEntity<RevertActionResponse> revertRes = auditLogPresenter.presentRevertLastAction();
+        assertEquals(HttpStatus.OK, revertRes.getStatusCode());
+        assertEquals(com.hotel.housekeeptrack.model.AuditAction.CHECK_IN, revertRes.getBody().getRevertedAction());
+        assertEquals(r606Id, revertRes.getBody().getTargetEntityId());
+        assertEquals(RoomStatus.READY, roomPresenter.presentRoomById(r606Id).getBody().getStatus());
+    }
 }

@@ -118,4 +118,24 @@ class AuditLogServiceTest {
         assertFalse(plainText.contains("\r"));
         assertTrue(plainText.contains("Total Records: 1"));
     }
+
+    @Test
+    @DisplayName("AuditLogService: Delete audit log successfully")
+    void testDeleteAuditLogSuccess() {
+        when(auditLogRepository.findById(1L)).thenReturn(java.util.Optional.of(sampleLog));
+
+        auditLogService.deleteAuditLog(1L);
+
+        verify(auditLogRepository).delete(sampleLog);
+    }
+
+    @Test
+    @DisplayName("AuditLogService: Delete audit log throws ResourceNotFoundException when not found")
+    void testDeleteAuditLogNotFound() {
+        when(auditLogRepository.findById(999L)).thenReturn(java.util.Optional.empty());
+
+        assertThrows(com.hotel.housekeeptrack.exception.ResourceNotFoundException.class,
+                () -> auditLogService.deleteAuditLog(999L));
+        verify(auditLogRepository, never()).delete(any());
+    }
 }

@@ -4,12 +4,9 @@ import com.hotel.housekeeptrack.dto.CreateRoomRequest;
 import com.hotel.housekeeptrack.exception.BusinessRuleException;
 import com.hotel.housekeeptrack.exception.InvalidRoomStateException;
 import com.hotel.housekeeptrack.exception.ResourceNotFoundException;
-import com.hotel.housekeeptrack.model.AuditAction;
-import com.hotel.housekeeptrack.model.Inspection;
-import com.hotel.housekeeptrack.model.InspectionResult;
-import com.hotel.housekeeptrack.model.Room;
-import com.hotel.housekeeptrack.model.RoomStatus;
-import com.hotel.housekeeptrack.model.TaskPriority;
+import com.hotel.housekeeptrack.model.*;
+import com.hotel.housekeeptrack.repository.CleaningTaskRepository;
+import com.hotel.housekeeptrack.repository.HousekeeperRepository;
 import com.hotel.housekeeptrack.repository.InspectionRepository;
 import com.hotel.housekeeptrack.repository.RoomRepository;
 import org.springframework.cache.annotation.CacheEvict;
@@ -31,15 +28,21 @@ public class RoomService {
     private final RoomRepository roomRepository;
     private final CleaningTaskService cleaningTaskService;
     private final InspectionRepository inspectionRepository;
+    private final CleaningTaskRepository cleaningTaskRepository;
+    private final HousekeeperRepository housekeeperRepository;
     private final AuditLogService auditLogService;
 
     public RoomService(RoomRepository roomRepository,
                        CleaningTaskService cleaningTaskService,
                        InspectionRepository inspectionRepository,
+                       CleaningTaskRepository cleaningTaskRepository,
+                       HousekeeperRepository housekeeperRepository,
                        AuditLogService auditLogService) {
         this.roomRepository = roomRepository;
         this.cleaningTaskService = cleaningTaskService;
         this.inspectionRepository = inspectionRepository;
+        this.cleaningTaskRepository = cleaningTaskRepository;
+        this.housekeeperRepository = housekeeperRepository;
         this.auditLogService = auditLogService;
     }
 
@@ -181,6 +184,7 @@ public class RoomService {
                     " back to cleaning: room is currently " + room.getStatus() + ". Only CLEANED or INSPECTED rooms can be sent back to cleaning.");
         }
 
+        RoomStatus previousStatus = room.getStatus();
         room.setStatus(RoomStatus.DIRTY);
         room.setDirtyAt(LocalDateTime.now());
         room.setReadyAt(null);
@@ -199,8 +203,48 @@ public class RoomService {
         cleaningTaskService.createAndDispatchTask(room, TaskPriority.HIGH, notes);
 
         auditLogService.log(AuditAction.SEND_TO_CLEANING, "Room", room.getId(), supervisor,
-                "Room " + room.getRoomNumber() + " sent back to cleaning: " + failureReason);
+                "Room " + room.getRoomNumber() + " sent back to cleaning from " + previousStatus + ": " + failureReason);
 
         return roomRepository.findById(roomId).orElse(room);
+    }
+
+    /**
+     * Safely deletes a room:
+     * Cleans up associated cleaning tasks (freeing assigned housekeepers),
+     * deletes inspections, deletes the room entity, records deletion in AuditLog,
+     * and evicts caches.
+     */
+    @Transactional
+    @CacheEvict(value = {"rooms", "systemSummary", "roomTurnaround", "housekeeperWorkloads"}, allEntries = true)
+    public void deleteRoom(Long roomId) {
+        Room room = getRoomById(roomId);
+
+        // 1. Clean up associated cleaning tasks and free assigned housekeepers
+        List<CleaningTask> tasks = cleaningTaskRepository.findByRoomId(roomId);
+        for (CleaningTask task : tasks) {
+            if (task.getHousekeeper() != null && task.getStatus() == TaskStatus.IN_PROGRESS) {
+                Housekeeper hk = task.getHousekeeper();
+                hk.setActiveTaskCount(Math.max(0, hk.getActiveTaskCount() - 1));
+                if (hk.getActiveTaskCount() == 0 && hk.getStatus() == HousekeeperStatus.BUSY) {
+                    hk.setStatus(HousekeeperStatus.AVAILABLE);
+                }
+                housekeeperRepository.save(hk);
+            }
+        }
+        cleaningTaskRepository.deleteAll(tasks);
+
+        // 2. Clean up associated inspections
+        List<Inspection> inspections = inspectionRepository.findByRoomIdOrderByInspectedAtDesc(roomId);
+        inspectionRepository.deleteAll(inspections);
+
+        // 3. Delete room entity
+        roomRepository.delete(room);
+
+        // 4. Record deletion in AuditLog
+        auditLogService.log(AuditAction.ROOM_DELETED, "Room", roomId, "Admin",
+                "Deleted room " + room.getRoomNumber() + " (" + room.getRoomType() + ")");
+
+        // 5. Trigger dispatch if housekeepers became available
+        cleaningTaskService.dispatchToAvailableHousekeepers();
     }
 }

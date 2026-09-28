@@ -45,4 +45,12 @@ public class HousekeeperController {
                                                             @RequestBody Map<String, String> payload) {
         return housekeeperPresenter.presentUpdatedStatus(id, payload);
     }
+
+    /**
+     * Safely deletes a housekeeper: re-queues active tasks to PENDING, logs in AuditLog, evicts cache.
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteHousekeeper(@PathVariable Long id) {
+        return housekeeperPresenter.presentDeletedHousekeeper(id);
+    }
 }

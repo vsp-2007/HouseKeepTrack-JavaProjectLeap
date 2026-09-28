@@ -95,4 +95,12 @@ public class RoomController {
             @RequestParam(required = false) String supervisorName) {
         return roomPresenter.presentSentBackToCleaning(id, reason, supervisorName);
     }
+
+    /**
+     * Safely deletes a room: cascades/cleans up associated tasks/inspections, logs deletion, and evicts cache.
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteRoom(@PathVariable Long id) {
+        return roomPresenter.presentDeletedRoom(id);
+    }
 }

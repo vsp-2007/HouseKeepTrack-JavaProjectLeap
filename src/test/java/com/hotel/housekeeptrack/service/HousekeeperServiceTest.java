@@ -147,4 +147,36 @@ class HousekeeperServiceTest {
         // Verify dispatch triggered for remaining staff
         verify(cleaningTaskService).dispatchToAvailableHousekeepers();
     }
+
+    @Test
+    @DisplayName("Delete housekeeper re-queues active tasks to PENDING, unlinks tasks, and deletes housekeeper")
+    void testDeleteHousekeeperSuccess() {
+        Room room = new Room("102", "STANDARD", RoomStatus.IN_CLEANING);
+        CleaningTask activeTask = new CleaningTask(room, TaskPriority.HIGH, "Cleaning");
+        activeTask.setId(11L);
+        activeTask.setStatus(TaskStatus.IN_PROGRESS);
+        activeTask.setHousekeeper(housekeeper);
+
+        CleaningTask completedTask = new CleaningTask(room, TaskPriority.NORMAL, "Old Task");
+        completedTask.setId(12L);
+        completedTask.setStatus(TaskStatus.COMPLETED);
+        completedTask.setHousekeeper(housekeeper);
+
+        when(housekeeperRepository.findById(1L)).thenReturn(Optional.of(housekeeper));
+        when(cleaningTaskRepository.findByHousekeeperIdAndStatus(1L, TaskStatus.IN_PROGRESS))
+                .thenReturn(Collections.singletonList(activeTask));
+        when(cleaningTaskRepository.findByHousekeeperId(1L))
+                .thenReturn(java.util.List.of(activeTask, completedTask));
+
+        housekeeperService.deleteHousekeeper(1L);
+
+        assertEquals(TaskStatus.PENDING, activeTask.getStatus());
+        assertNull(activeTask.getHousekeeper());
+        assertEquals(RoomStatus.DIRTY, room.getStatus());
+        assertNull(completedTask.getHousekeeper());
+
+        verify(housekeeperRepository).delete(housekeeper);
+        verify(auditLogService).log(eq(AuditAction.STAFF_DELETED), eq("Housekeeper"), eq(1L), anyString(), anyString());
+        verify(cleaningTaskService).dispatchToAvailableHousekeepers();
+    }
 }

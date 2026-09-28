@@ -1,5 +1,6 @@
 package com.hotel.housekeeptrack.service;
 
+import com.hotel.housekeeptrack.exception.ResourceNotFoundException;
 import com.hotel.housekeeptrack.model.AuditAction;
 import com.hotel.housekeeptrack.model.AuditLog;
 import com.hotel.housekeeptrack.repository.AuditLogRepository;
@@ -123,5 +124,15 @@ public class AuditLogService {
     private String escapeMarkdown(String value) {
         if (value == null) return "-";
         return value.replace("|", "\\|").replace("\r", "").replace("\n", " ");
+    }
+
+    /**
+     * Deletes a specific audit log record by ID.
+     */
+    @Transactional
+    public void deleteAuditLog(Long id) {
+        AuditLog auditLog = auditLogRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("AuditLog not found with ID: " + id));
+        auditLogRepository.delete(auditLog);
     }
 }

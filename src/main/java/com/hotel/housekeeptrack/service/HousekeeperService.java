@@ -84,6 +84,7 @@ public class HousekeeperService {
     @CacheEvict(value = {"housekeeperWorkloads", "systemSummary", "rooms"}, allEntries = true)
     public Housekeeper updateStatus(Long id, HousekeeperStatus status) {
         Housekeeper housekeeper = getHousekeeperById(id);
+        HousekeeperStatus oldStatus = housekeeper.getStatus();
 
         if (status == HousekeeperStatus.OFFLINE) {
             // Re-queue active tasks so rooms are not abandoned or stuck
@@ -105,7 +106,7 @@ public class HousekeeperService {
             housekeeper = housekeeperRepository.save(housekeeper);
 
             auditLogService.log(AuditAction.STAFF_STATUS_CHANGED, "Housekeeper", housekeeper.getId(), "Admin",
-                    "Status updated to OFFLINE for housekeeper " + housekeeper.getName());
+                    "Status updated from " + oldStatus + " to OFFLINE for housekeeper " + housekeeper.getName());
 
             // Re-dispatch orphaned tasks to other available staff
             cleaningTaskService.dispatchToAvailableHousekeepers();
@@ -120,7 +121,7 @@ public class HousekeeperService {
             housekeeper = housekeeperRepository.save(housekeeper);
 
             auditLogService.log(AuditAction.STAFF_STATUS_CHANGED, "Housekeeper", housekeeper.getId(), "Admin",
-                    "Status updated to AVAILABLE for housekeeper " + housekeeper.getName());
+                    "Status updated from " + oldStatus + " to AVAILABLE for housekeeper " + housekeeper.getName());
 
             cleaningTaskService.dispatchToAvailableHousekeepers();
             return housekeeper;
@@ -130,8 +131,53 @@ public class HousekeeperService {
         housekeeper = housekeeperRepository.save(housekeeper);
 
         auditLogService.log(AuditAction.STAFF_STATUS_CHANGED, "Housekeeper", housekeeper.getId(), "Admin",
-                "Status updated to " + status + " for housekeeper " + housekeeper.getName());
+                "Status updated from " + oldStatus + " to " + status + " for housekeeper " + housekeeper.getName());
 
         return housekeeper;
+    }
+
+    /**
+     * Safely deletes a housekeeper:
+     * Re-queues active tasks to PENDING and reverts affected rooms to DIRTY,
+     * unlinks past tasks to preserve referential integrity, deletes housekeeper,
+     * logs in AuditLog, and evicts caches.
+     */
+    @Transactional
+    @CacheEvict(value = {"housekeeperWorkloads", "systemSummary", "rooms"}, allEntries = true)
+    public void deleteHousekeeper(Long id) {
+        Housekeeper housekeeper = getHousekeeperById(id);
+
+        // 1. Re-queue active tasks to PENDING
+        List<CleaningTask> activeTasks = cleaningTaskRepository.findByHousekeeperIdAndStatus(id, TaskStatus.IN_PROGRESS);
+        for (CleaningTask task : activeTasks) {
+            task.setStatus(TaskStatus.PENDING);
+            task.setHousekeeper(null);
+            task.setAssignedAt(null);
+            task.setStartedAt(null);
+            cleaningTaskRepository.save(task);
+
+            Room room = task.getRoom();
+            if (room != null) {
+                room.setStatus(RoomStatus.DIRTY);
+                roomRepository.save(room);
+            }
+        }
+
+        // 2. Unlink all tasks referencing this housekeeper to avoid foreign key violation
+        List<CleaningTask> allTasks = cleaningTaskRepository.findByHousekeeperId(id);
+        for (CleaningTask task : allTasks) {
+            task.setHousekeeper(null);
+            cleaningTaskRepository.save(task);
+        }
+
+        // 3. Delete the housekeeper entity
+        housekeeperRepository.delete(housekeeper);
+
+        // 4. Log in AuditLog
+        auditLogService.log(AuditAction.STAFF_DELETED, "Housekeeper", id, "Admin",
+                "Deleted housekeeper " + housekeeper.getName() + " (" + housekeeper.getEmail() + ")");
+
+        // 5. Re-dispatch queued tasks to other available staff
+        cleaningTaskService.dispatchToAvailableHousekeepers();
     }
 }

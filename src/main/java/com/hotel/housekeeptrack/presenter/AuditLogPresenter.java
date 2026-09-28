@@ -1,8 +1,11 @@
 package com.hotel.housekeeptrack.presenter;
 
 import com.hotel.housekeeptrack.dto.AuditLogResponse;
+import com.hotel.housekeeptrack.dto.RevertActionResponse;
 import com.hotel.housekeeptrack.model.AuditLog;
 import com.hotel.housekeeptrack.service.AuditLogService;
+import com.hotel.housekeeptrack.service.RevertService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -21,10 +24,20 @@ import java.time.format.DateTimeFormatter;
 public class AuditLogPresenter {
 
     private final AuditLogService auditLogService;
+    private final RevertService revertService;
     private static final DateTimeFormatter FILE_TS_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
 
-    public AuditLogPresenter(AuditLogService auditLogService) {
+    @Autowired
+    public AuditLogPresenter(AuditLogService auditLogService, RevertService revertService) {
         this.auditLogService = auditLogService;
+        this.revertService = revertService;
+    }
+
+    public ResponseEntity<RevertActionResponse> presentRevertLastAction() {
+        if (revertService == null) {
+            throw new IllegalStateException("RevertService is not configured.");
+        }
+        return ResponseEntity.ok(revertService.revertLastAction());
     }
 
     public ResponseEntity<Page<AuditLogResponse>> presentAuditLogs(Pageable pageable) {
@@ -57,5 +70,10 @@ public class AuditLogPresenter {
                 .header(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION)
                 .contentType(mediaType)
                 .body(content.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public ResponseEntity<Void> presentDeletedAuditLog(Long id) {
+        auditLogService.deleteAuditLog(id);
+        return ResponseEntity.noContent().build();
     }
 }

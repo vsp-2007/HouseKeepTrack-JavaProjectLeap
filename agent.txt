@@ -138,17 +138,31 @@ for writemode any issues are design implemented changes report here {
    - Blinking Page Number Alert: Keyframes pulse/blink animation (@keyframes alertBlinkRedAmber in red-amber with glowing indicator) on page number buttons when unread changes occur on non-viewed pages (status changes, task queues, staff availability, or new audit entries), automatically extinguished once user navigates to and reads that page.
    - Operational Audit Trail Section: Displays recent audit logs paginated 5 per page with color-coded action badges, actor, entity ID, and event details.
 
-8. Test Verification:
-   - Comprehensive test coverage across 10 test suites:
-     * AuditLogServiceTest (4 tests)
-     * AuditLogControllerTest (4 tests)
-     * HouseKeepTrackIntegrationTest (7 tests)
-     * RoomServiceTest (13 tests)
+8. Mistake-Handling Revert & Safe Deletion Operations:
+   - Single Action Revert ("↺ Revert Last Action"):
+     * Endpoints: `POST /api/audit-logs/revert-last` and `POST /api/system/revert-last`.
+     * Service: `RevertService` finds the most recent un-reverted action from the audit log (CHECK_IN, CHECKOUT, MARK_READY, SEND_TO_CLEANING, STAFF_STATUS_CHANGED, INSPECTION_PASSED, INSPECTION_FAILED), rolls back domain state, cancels generated tasks, deletes failed inspection records, logs a new `REVERTED` audit event, and evicts all Spring Caches.
+     * Resiliency & Self-Healing: Automatically skips deleted target entities (preventing revert lockups), correctly preserves INSPECTED status and PASSED inspection results when rolling back SEND_TO_CLEANING, re-queues active tasks to PENDING if staff is rolled back to OFFLINE, safely resolves room references for inspections, and immediately dispatches pending cleaning tasks whenever staff members are freed.
+     * Frontend: "↺ Revert Last Action" button positioned in header bar and Audit section with confirmation and instant portal refresh.
+   - Safe Deletion with Inline SVG Trash Bin:
+     * Clean inline SVG icon (NO emoji, NO 🗑️) inside `.btn-red.btn-sm`.
+     * `DELETE /api/rooms/{id}`: Frees housekeepers from in-progress tasks, cascades tasks and inspections, deletes room, logs `ROOM_DELETED`, evicts cache, and re-dispatches tasks.
+     * `DELETE /api/housekeepers/{id}`: Re-queues active tasks to PENDING (reverting rooms to DIRTY), unlinks past tasks to preserve referential integrity, deletes housekeeper, logs `STAFF_DELETED`, and triggers queue dispatch.
+     * `DELETE /api/audit-logs/{id}`: Safely deletes individual audit trail entries.
+     * Frontend: Red bin delete button on every Room row, Housekeeper row, and Audit Log row with confirmation dialogs and safe state cache lookups.
+
+9. Test Verification:
+   - Comprehensive test coverage across 11 test suites:
+     * RevertServiceTest (11 tests)
+     * HouseKeepTrackIntegrationTest (13 tests)
+     * RoomServiceTest (14 tests)
+     * HousekeeperServiceTest (7 tests)
+     * AuditLogServiceTest (6 tests)
+     * AuditLogControllerTest (6 tests)
      * CleaningTaskServiceTest (5 tests)
-     * HousekeeperServiceTest (6 tests)
      * InspectionServiceTest (5 tests)
      * MetricsServiceTest (3 tests)
      * RoomPresenterTest (2 tests)
      * GlobalExceptionHandlerTest (6 tests)
-   - Total Tests Run: 55, Failures: 0, Errors: 0, Skipped: 0. Status: BUILD SUCCESS (`mvn clean test`).
+   - Total Tests Run: 78, Failures: 0, Errors: 0, Skipped: 0. Status: BUILD SUCCESS (`mvn clean test`).
 }

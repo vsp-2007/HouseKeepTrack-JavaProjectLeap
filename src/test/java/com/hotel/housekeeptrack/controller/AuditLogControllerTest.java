@@ -25,13 +25,16 @@ import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AuditLogControllerTest {
 
     @Mock
     private AuditLogService auditLogService;
+
+    @Mock
+    private com.hotel.housekeeptrack.service.RevertService revertService;
 
     private AuditLogPresenter auditLogPresenter;
     private AuditLogController auditLogController;
@@ -40,7 +43,7 @@ class AuditLogControllerTest {
 
     @BeforeEach
     void setUp() {
-        auditLogPresenter = new AuditLogPresenter(auditLogService);
+        auditLogPresenter = new AuditLogPresenter(auditLogService, revertService);
         auditLogController = new AuditLogController(auditLogPresenter);
 
         sampleLog = new AuditLog(LocalDateTime.now(), AuditAction.CHECKOUT, "Room", 201L, "FrontDesk", "Guest checked out");
@@ -107,5 +110,29 @@ class AuditLogControllerTest {
     @DisplayName("AuditLogController: GET /api/audit-logs/download?format=invalid throws IllegalArgumentException")
     void testDownloadAuditLogsUnsupportedFormatThrowsException() {
         assertThrows(IllegalArgumentException.class, () -> auditLogController.downloadAuditLogs("unsupported_format"));
+    }
+
+    @Test
+    @DisplayName("AuditLogController: POST /api/audit-logs/revert-last successfully reverts action")
+    void testRevertLastAction() {
+        com.hotel.housekeeptrack.dto.RevertActionResponse mockResponse =
+                new com.hotel.housekeeptrack.dto.RevertActionResponse("Reverted CHECK_IN", AuditAction.CHECK_IN, 101L, "Room", null);
+        when(revertService.revertLastAction()).thenReturn(mockResponse);
+
+        ResponseEntity<com.hotel.housekeeptrack.dto.RevertActionResponse> response = auditLogController.revertLastAction();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(AuditAction.CHECK_IN, response.getBody().getRevertedAction());
+        assertEquals("Reverted CHECK_IN", response.getBody().getMessage());
+    }
+
+    @Test
+    @DisplayName("AuditLogController: DELETE /api/audit-logs/{id} returns no content")
+    void testDeleteAuditLog() {
+        doNothing().when(auditLogService).deleteAuditLog(10L);
+
+        ResponseEntity<Void> response = auditLogController.deleteAuditLog(10L);
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        verify(auditLogService).deleteAuditLog(10L);
     }
 }

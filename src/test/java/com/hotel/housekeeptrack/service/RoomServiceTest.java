@@ -3,6 +3,7 @@ package com.hotel.housekeeptrack.service;
 import com.hotel.housekeeptrack.dto.CreateRoomRequest;
 import com.hotel.housekeeptrack.exception.BusinessRuleException;
 import com.hotel.housekeeptrack.exception.InvalidRoomStateException;
+import com.hotel.housekeeptrack.model.AuditAction;
 import com.hotel.housekeeptrack.model.InspectionResult;
 import com.hotel.housekeeptrack.model.Room;
 import com.hotel.housekeeptrack.model.RoomStatus;
@@ -35,6 +36,12 @@ class RoomServiceTest {
 
     @Mock
     private com.hotel.housekeeptrack.repository.InspectionRepository inspectionRepository;
+
+    @Mock
+    private com.hotel.housekeeptrack.repository.CleaningTaskRepository cleaningTaskRepository;
+
+    @Mock
+    private com.hotel.housekeeptrack.repository.HousekeeperRepository housekeeperRepository;
 
     @Mock
     private AuditLogService auditLogService;
@@ -205,5 +212,31 @@ class RoomServiceTest {
 
             assertThrows(InvalidRoomStateException.class, () -> roomService.sendBackToCleaning(1L, "Reason", "Supervisor Dave"));
         }
+    }
+
+    @Test
+    @DisplayName("Delete room successfully cascades tasks, inspections, and logs audit")
+    void testDeleteRoomSuccess() {
+        when(roomRepository.findById(1L)).thenReturn(Optional.of(room));
+        com.hotel.housekeeptrack.model.Housekeeper hk = new com.hotel.housekeeptrack.model.Housekeeper("Sam", "sam@hotel.com", "555");
+        hk.setStatus(com.hotel.housekeeptrack.model.HousekeeperStatus.BUSY);
+        hk.setActiveTaskCount(1);
+
+        com.hotel.housekeeptrack.model.CleaningTask task = new com.hotel.housekeeptrack.model.CleaningTask(room, TaskPriority.NORMAL, "Note");
+        task.setStatus(com.hotel.housekeeptrack.model.TaskStatus.IN_PROGRESS);
+        task.setHousekeeper(hk);
+
+        when(cleaningTaskRepository.findByRoomId(1L)).thenReturn(java.util.Collections.singletonList(task));
+        when(inspectionRepository.findByRoomIdOrderByInspectedAtDesc(1L)).thenReturn(java.util.Collections.emptyList());
+
+        roomService.deleteRoom(1L);
+
+        assertEquals(0, hk.getActiveTaskCount());
+        assertEquals(com.hotel.housekeeptrack.model.HousekeeperStatus.AVAILABLE, hk.getStatus());
+        verify(housekeeperRepository).save(hk);
+        verify(cleaningTaskRepository).deleteAll(anyList());
+        verify(inspectionRepository).deleteAll(anyList());
+        verify(roomRepository).delete(room);
+        verify(auditLogService).log(eq(AuditAction.ROOM_DELETED), eq("Room"), eq(1L), anyString(), anyString());
     }
 }

@@ -539,6 +539,7 @@
             <h1>HouseKeepTrack</h1>
             <p class="subtitle">Hotel Room Lifecycle & Automated Housekeeping Management Portal</p>
             <div class="header-actions">
+                <button class="btn-sm btn-orange" onclick="revertLastAction()" title="Revert the most recent operational action">&#x21ba; Revert Last Action</button>
                 <button class="btn-sm btn-purple" onclick="openDownloadModal()"> Download Audit Logs</button>
                 <button class="refresh-btn btn-sm" onclick="refreshAll()">&#x21bb; Refresh Data</button>
             </div>
@@ -610,7 +611,7 @@
                         <th style="width: 110px;">Type</th>
                         <th style="width: 130px;">Status</th>
                         <th>Timeline Details</th>
-                        <th style="width: 250px;">Lifecycle Actions</th>
+                        <th style="width: 310px;">Lifecycle Actions</th>
                     </tr>
                 </thead>
                 <tbody id="roomsTableBody">
@@ -702,7 +703,7 @@
                         <th style="width: 110px;">Active Tasks</th>
                         <th style="width: 120px;">Completed Tasks</th>
                         <th style="width: 140px;">Avg Turnaround</th>
-                        <th style="width: 160px;">Status Toggle</th>
+                        <th style="width: 220px;">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="staffTableBody">
@@ -755,7 +756,10 @@
         <div class="section-box">
             <h2>
                 <span>5. Operational Audit Trail & Accountability Log</span>
-                <button class="btn-sm btn-purple" onclick="openDownloadModal()"> Download Audit Logs</button>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-sm btn-orange" onclick="revertLastAction()" title="Revert the most recent operational action">&#x21ba; Revert Last Action</button>
+                    <button class="btn-sm btn-purple" onclick="openDownloadModal()"> Download Audit Logs</button>
+                </div>
             </h2>
             <div class="info-note">
                 <strong>Accountability & Change Tracking:</strong> Records chronological operational changes, actors,
@@ -772,11 +776,12 @@
                         <th style="width: 120px;">Entity</th>
                         <th style="width: 120px;">Actor</th>
                         <th>Event Details</th>
+                        <th style="width: 90px;">Action</th>
                     </tr>
                 </thead>
                 <tbody id="auditTableBody">
                     <tr>
-                        <td colspan="6" style="text-align:center;">Loading audit trail...</td>
+                        <td colspan="7" style="text-align:center;">Loading audit trail...</td>
                     </tr>
                 </tbody>
             </table>
@@ -867,6 +872,7 @@
     <script>
         const API_BASE = '/api';
         const PAGE_SIZE = 5;
+        const BIN_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 3px;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>';
 
         // Data caches
         let allRooms = [];
@@ -1086,6 +1092,8 @@
                         <button class="btn-sm" style="background:#888;" onclick="checkInRoom(${r.id})" title="Will test barrier invariant">Test Check-In</button>
                     `;
                 }
+
+                actionButtons += `<button class="btn-sm btn-red" onclick="deleteRoom(${r.id})" title="Delete Room">${BIN_ICON_SVG}Delete</button>`;
 
                 return `
                     <tr>
@@ -1351,8 +1359,10 @@
                 } else if (s.status === 'OFFLINE') {
                     toggleBtn = `<button class="btn-sm btn-green" onclick="updateStaffStatus(${s.id}, 'AVAILABLE')">Go AVAILABLE</button>`;
                 } else if (s.status === 'BUSY') {
-                    toggleBtn = `<span style="font-size:12px; color:#e36a05;">Busy on task</span>`;
+                    toggleBtn = `<span style="font-size:12px; color:#e36a05; margin-right: 6px;">Busy on task</span>`;
                 }
+
+                const deleteStaffBtn = `<button class="btn-sm btn-red" onclick="deleteHousekeeper(${s.id})" title="Delete Housekeeper">${BIN_ICON_SVG}Delete</button>`;
 
                 return `
                     <tr>
@@ -1363,7 +1373,7 @@
                         <td>${s.activeTaskCount || 0}</td>
                         <td>${w.completedTaskCount || 0}</td>
                         <td>${avgMin}</td>
-                        <td>${toggleBtn}</td>
+                        <td>${toggleBtn} ${deleteStaffBtn}</td>
                     </tr>
                 `;
             }).join('');
@@ -1502,7 +1512,7 @@
                 renderPagination('audit', allAuditLogs.length, auditPage, setAuditPage);
             } catch (err) {
                 document.getElementById('auditTableBody').innerHTML =
-                    `<tr><td colspan="6" style="color:red; text-align:center;">Error: ${err.message}</td></tr>`;
+                    `<tr><td colspan="7" style="color:red; text-align:center;">Error: ${err.message}</td></tr>`;
             }
         }
 
@@ -1521,12 +1531,13 @@
         function renderAuditTable() {
             const tbody = document.getElementById('auditTableBody');
             if (allAuditLogs.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No audit log events recorded yet.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No audit log events recorded yet.</td></tr>';
                 return;
             }
 
             const pageLogs = allAuditLogs.slice((auditPage - 1) * PAGE_SIZE, auditPage * PAGE_SIZE);
             tbody.innerHTML = pageLogs.map(log => {
+                const deleteBtn = `<button class="btn-sm btn-red" onclick="deleteAuditLog(${log.id})" title="Delete Action Entry">${BIN_ICON_SVG}Delete</button>`;
                 return `
                     <tr>
                         <td>${log.id}</td>
@@ -1535,6 +1546,7 @@
                         <td>${log.entityType} #${log.entityId}</td>
                         <td><strong>${log.actor}</strong></td>
                         <td>${log.details || '-'}</td>
+                        <td>${deleteBtn}</td>
                     </tr>
                 `;
             }).join('');
@@ -1618,6 +1630,84 @@
             const downloadUrl = `${API_BASE}/audit-logs/download?format=${selectedFormat}`;
             window.location.href = downloadUrl;
             showAlert(`Audit log download initiated (${selectedFormat.toUpperCase()} format).`);
+        }
+
+        // Revert Last Operational Action
+        async function revertLastAction() {
+            if (!confirm('Revert the last operational action? This will undo the state change and record a REVERTED audit entry.')) {
+                return;
+            }
+            try {
+                const res = await fetch(`${API_BASE}/audit-logs/revert-last`, { method: 'POST' });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || 'Failed to revert last action');
+                showAlert(`↺ Revert Success: ${data.message || 'Action reverted.'}`);
+                refreshAll();
+            } catch (err) {
+                showAlert(`Revert Failed: ${err.message}`, true);
+            }
+        }
+
+        // Delete Room (cascades tasks & inspections)
+        async function deleteRoom(id, roomNumber) {
+            if (!roomNumber) {
+                const r = allRooms.find(x => x.id === id);
+                roomNumber = r ? r.roomNumber : '#' + id;
+            }
+            if (!confirm(`Are you sure you want to delete Room ${roomNumber}? This will remove all associated cleaning tasks and inspections.`)) {
+                return;
+            }
+            try {
+                const res = await fetch(`${API_BASE}/rooms/${id}`, { method: 'DELETE' });
+                if (!res.ok) {
+                    const data = await res.json().catch(() => ({}));
+                    throw new Error(data.message || 'Failed to delete room');
+                }
+                showAlert(`Room ${roomNumber} deleted successfully.`);
+                refreshAll();
+            } catch (err) {
+                showAlert(`Delete Failed: ${err.message}`, true);
+            }
+        }
+
+        // Delete Housekeeper (re-queues active tasks to PENDING)
+        async function deleteHousekeeper(id, name) {
+            if (!name) {
+                const s = allStaff.find(x => x.id === id);
+                name = s ? s.name : '#' + id;
+            }
+            if (!confirm(`Are you sure you want to delete housekeeper "${name}"? Any active cleaning tasks will be re-queued to PENDING.`)) {
+                return;
+            }
+            try {
+                const res = await fetch(`${API_BASE}/housekeepers/${id}`, { method: 'DELETE' });
+                if (!res.ok) {
+                    const data = await res.json().catch(() => ({}));
+                    throw new Error(data.message || 'Failed to delete housekeeper');
+                }
+                showAlert(`Housekeeper "${name}" deleted successfully.`);
+                refreshAll();
+            } catch (err) {
+                showAlert(`Delete Failed: ${err.message}`, true);
+            }
+        }
+
+        // Delete Individual Audit Log Record
+        async function deleteAuditLog(id) {
+            if (!confirm(`Are you sure you want to delete audit log entry #${id}?`)) {
+                return;
+            }
+            try {
+                const res = await fetch(`${API_BASE}/audit-logs/${id}`, { method: 'DELETE' });
+                if (!res.ok) {
+                    const data = await res.json().catch(() => ({}));
+                    throw new Error(data.message || 'Failed to delete audit log entry');
+                }
+                showAlert(`Audit log #${id} deleted successfully.`);
+                refreshAll();
+            } catch (err) {
+                showAlert(`Delete Failed: ${err.message}`, true);
+            }
         }
 
         function formatTime(isoStr) {

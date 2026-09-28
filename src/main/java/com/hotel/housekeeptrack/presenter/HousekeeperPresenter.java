@@ -60,4 +60,9 @@ public class HousekeeperPresenter {
         Housekeeper housekeeper = housekeeperService.updateStatus(id, status);
         return ResponseEntity.ok(HousekeeperResponse.fromEntity(housekeeper));
     }
+
+    public ResponseEntity<Void> presentDeletedHousekeeper(Long id) {
+        housekeeperService.deleteHousekeeper(id);
+        return ResponseEntity.noContent().build();
+    }
 }

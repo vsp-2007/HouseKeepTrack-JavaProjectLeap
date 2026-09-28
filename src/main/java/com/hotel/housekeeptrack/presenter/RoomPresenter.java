@@ -68,4 +68,9 @@ public class RoomPresenter {
         Room room = roomService.sendBackToCleaning(id, reason, supervisorName);
         return ResponseEntity.ok(RoomResponse.fromEntity(room));
     }
+
+    public ResponseEntity<Void> presentDeletedRoom(Long id) {
+        roomService.deleteRoom(id);
+        return ResponseEntity.noContent().build();
+    }
 }
