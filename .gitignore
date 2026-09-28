@@ -4,3 +4,4 @@ target/
 .vscode/
 *.class
 /walkthrough.md
+artifacts/desktop.ini
