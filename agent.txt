@@ -1,0 +1,82 @@
+
+topic: HouseKeepTrack
+
+objective
+build a backend (A hotel house keeping staffs clean rooms based on a supervisor's verbal instruction leads to guest checking in before cleaning )that tracks each rooms's status(dirty/clean/inspected/ready)and auto assigns cleaning task to available staffs
+ core features
+ track room status through a defined lifecycle after checkout
+ auto generate / assign a cleaning task when a becomes dirty and assign it to an available hosekeeper
+ supervisor inspects and marks as cleaned room as inspected/ready or send it back to cleaning
+ prevent a room from being marked readyfor check in unless it has passed inspection
+ view housekeeper workload and avaerage room turnaround time
+
+
+ db design ;
+ entity -room,CleaningTask,housekeeper,inspection...model the relationship between them based on how they intract with the features and give each a primary key and fields needed to support every features listed(use my sql shell if needed auth req me )
+
+ enforced rule:
+  a room status can only move forward througnh the defined lifecycle,or back to cleaning if inspection fails
+  a room cannot be allocated to a guest unleas its status it ready
+
+  enfore these on service layer rather that the  db so invalid req can be rejected immediately without corruption with a clean error.
+
+
+  build steps
+  1.setupand initialize a springboot proj with Spring web ,data jpa,validation and mysqldriver(for this u can initialize using the powershell using the spring.io's endpoints)
+  2.design entity classes starting with room using suggested entiies(in db design) add the relationship and fields implied by above requiremnts
+  3.create a Spring data jpa repo interface for each entity extending jparepo
+  4.write service class that holds your buiseness logic .enforce rule here
+  5.build rest controllers  endpoints exposing one endpoints per core features listed above .should returm meaningful http status codes.
+  6.add input validation eg@notnull,etc.add global exeption handler(@controllerAdvice) so bad req return clear error messages insteadof stack traces
+  7.test every endpoint using postman,covering both normal path and the edge cases implied by your buiseness rule
+
+additional things could be implemented if the all base services are at a stable working stage
+1.add pagination,sorting,caching,busiest read endpoints
+2.add a simple audit log recording who changed what when for accountability
+
+
+for plan mode design architecture first and report the contadictions,important points and notes here {
+1. Architecture Overview:
+   - Framework: Spring Boot 3.x (with Java 25 LTS) using Spring Web, Spring Data JPA, Bean Validation, MySQL Connector.
+   - Layered Design:
+     * Controller Layer: REST endpoints with explicit DTOs and validation (@Valid, @NotNull, etc.).
+     * Service Layer: Enforces strict lifecycle state machine and business invariants before DB operations.
+     * Repository Layer: Spring Data JPA interfaces for Room, Housekeeper, CleaningTask, Inspection.
+     * Exception Handling: @RestControllerAdvice handling CustomBusinessRuleException, ResourceNotFoundException, and MethodArgumentNotValidException.
+   - Core Entities & Relations:
+     * Room (1) -> (M) CleaningTask
+     * Room (1) -> (M) Inspection
+     * Housekeeper (1) -> (M) CleaningTask
+     * Room: id, roomNumber, roomType, status [DIRTY, IN_CLEANING, CLEANED, INSPECTED, READY, OCCUPIED], activeCleaningTaskId, dirtyAt, readyAt.
+     * Housekeeper: id, name, email, phone, status [AVAILABLE, BUSY, OFFLINE], activeTaskCount.
+     * CleaningTask: id, room_id, housekeeper_id, status [PENDING, IN_PROGRESS, COMPLETED, CANCELLED], assignedAt, startedAt, completedAt, notes.
+     * Inspection: id, room_id, supervisorName, result [PASSED, FAILED], failureReason, inspectedAt.
+
+2. Contradictions & Ambiguities Resolved (User Feedback Incorporated):
+   - Dual-Path Inspection Lifecycle:
+     * Room lifecycle: DIRTY -> IN_CLEANING -> CLEANED -> INSPECTED -> (READY or DIRTY).
+     * When a supervisor inspects a CLEANED room, it transitions to INSPECTED with the recorded inspection result.
+     * From INSPECTED, there are two distinct paths:
+       a) Path 1 (PASSED): Supervisor can transition room to READY (markReady endpoint). Only rooms with PASSED inspection can be marked READY.
+       b) Path 2 (FAILED / Re-cleaning needed): Due to improper works or failed inspection, supervisor sends the room back to cleaning. Room status transitions back to DIRTY, and a new high-priority CleaningTask is auto-generated with failure notes and auto-assigned.
+     * Crucially: INSPECTED is a necessary intermediate stage; markReady is not the only path for INSPECTED.
+   - Auto-assignment Queuing:
+     * Approved: When no housekeeper is available, the CleaningTask status is set to PENDING (queued). As soon as any housekeeper finishes their current task, the system auto-assigns the oldest pending task.
+   - Turnaround Time:
+     * Track both cleaning turnaround time per housekeeper (startedAt to completedAt) and total room turnaround time (dirtyAt to readyAt).
+
+3. Important Points & Business Rules:
+   - Service Layer Invariant: A room cannot be allocated/checked-in to a guest unless status is strictly READY.
+   - Forward-only Lifecycle with Re-cleaning Loop: Transitions strictly follow the lifecycle. The only permitted regression is from INSPECTED/CLEANED -> DIRTY when inspection fails or re-cleaning is required.
+   - Immediate Validation: Invalid transitions must reject requests with HTTP 400 Bad Request / 409 Conflict with descriptive error payloads instead of stack traces or DB errors.
+   - MySQL Auth: Verified and confirmed with root / v2i0s0n7u on MySQL80 service. Database: housekeeptrack_db.
+   - Code Quality & Modularity: Clean modular components, explicit DTOs, idempotent actions where applicable, short and clear comments explaining state machine and queue logic.
+}
+
+
+
+for writemode any issues are design implemented changes report here {
+
+
+
+}
