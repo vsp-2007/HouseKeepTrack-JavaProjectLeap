@@ -36,6 +36,9 @@ class RoomServiceTest {
     @Mock
     private com.hotel.housekeeptrack.repository.InspectionRepository inspectionRepository;
 
+    @Mock
+    private AuditLogService auditLogService;
+
     @InjectMocks
     private RoomService roomService;
 

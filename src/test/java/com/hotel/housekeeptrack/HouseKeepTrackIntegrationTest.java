@@ -41,6 +41,9 @@ class HouseKeepTrackIntegrationTest {
     @Autowired
     private MetricsPresenter metricsPresenter;
 
+    @Autowired
+    private AuditLogPresenter auditLogPresenter;
+
     @Test
     @DisplayName("End-to-End Hotel Lifecycle in MVP: Create -> Check-In -> Checkout -> Auto-Assign -> Complete -> Inspect (PASSED) -> Ready -> Check-In")
     void testFullRoomLifecycle() {
@@ -272,5 +275,59 @@ class HouseKeepTrackIntegrationTest {
         // Housekeeper 2 is now BUSY
         HousekeeperResponse hk2 = housekeeperPresenter.presentHousekeeperById(hk2Id).getBody();
         assertEquals(com.hotel.housekeeptrack.model.HousekeeperStatus.BUSY, hk2.getStatus());
+    }
+
+    @Test
+    @DisplayName("Audit Logging & Download: Tracks operational lifecycle events and exports in MD and TXT")
+    void testAuditLoggingAndDownloadWorkflow() {
+        // 1. Create room, register housekeeper, check-in, checkout
+        CreateRoomRequest roomReq = new CreateRoomRequest("506", "SUITE");
+        long roomId = roomPresenter.presentCreatedRoom(roomReq).getBody().getId();
+
+        CreateHousekeeperRequest hkReq = new CreateHousekeeperRequest("Audited Staff", "audit.staff@hotel.com", "555-9999");
+        long hkId = housekeeperPresenter.presentCreatedHousekeeper(hkReq).getBody().getId();
+
+        roomPresenter.presentCheckedInRoom(roomId);
+        roomPresenter.presentCheckedOutRoom(roomId);
+
+        // 2. Fetch Paginated Audit Logs
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(0, 10);
+        ResponseEntity<org.springframework.data.domain.Page<AuditLogResponse>> logRes = auditLogPresenter.presentAuditLogs(pageable);
+        assertEquals(HttpStatus.OK, logRes.getStatusCode());
+        assertNotNull(logRes.getBody());
+        org.springframework.data.domain.Page<AuditLogResponse> page = logRes.getBody();
+        assertTrue(page.getTotalElements() >= 4);
+
+        List<AuditLogResponse> logs = page.getContent();
+        boolean hasRoomCreated = logs.stream().anyMatch(l -> l.getAction() == com.hotel.housekeeptrack.model.AuditAction.ROOM_CREATED);
+        boolean hasStaffReg = logs.stream().anyMatch(l -> l.getAction() == com.hotel.housekeeptrack.model.AuditAction.STAFF_REGISTERED);
+        boolean hasCheckIn = logs.stream().anyMatch(l -> l.getAction() == com.hotel.housekeeptrack.model.AuditAction.CHECK_IN);
+        boolean hasCheckout = logs.stream().anyMatch(l -> l.getAction() == com.hotel.housekeeptrack.model.AuditAction.CHECKOUT);
+
+        assertTrue(hasRoomCreated, "Audit log should contain ROOM_CREATED");
+        assertTrue(hasStaffReg, "Audit log should contain STAFF_REGISTERED");
+        assertTrue(hasCheckIn, "Audit log should contain CHECK_IN");
+        assertTrue(hasCheckout, "Audit log should contain CHECKOUT");
+
+        // 3. Test Markdown Download
+        ResponseEntity<byte[]> mdRes = auditLogPresenter.presentDownload("md");
+        assertEquals(HttpStatus.OK, mdRes.getStatusCode());
+        assertTrue(mdRes.getHeaders().getContentType().toString().contains("text/markdown"));
+        String mdFilename = mdRes.getHeaders().getFirst(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION);
+        assertNotNull(mdFilename);
+        assertTrue(mdFilename.contains("housekeeptrack-audit-log-"));
+        assertTrue(mdFilename.endsWith(".md\""));
+        String mdBody = new String(mdRes.getBody(), java.nio.charset.StandardCharsets.UTF_8);
+        assertTrue(mdBody.contains("# HouseKeepTrack - Operational Audit Log Report"));
+
+        // 4. Test Plain Text Download
+        ResponseEntity<byte[]> txtRes = auditLogPresenter.presentDownload("txt");
+        assertEquals(HttpStatus.OK, txtRes.getStatusCode());
+        assertTrue(txtRes.getHeaders().getContentType().toString().contains("text/plain"));
+        String txtFilename = txtRes.getHeaders().getFirst(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION);
+        assertNotNull(txtFilename);
+        assertTrue(txtFilename.endsWith(".txt\""));
+        String txtBody = new String(txtRes.getBody(), java.nio.charset.StandardCharsets.UTF_8);
+        assertTrue(txtBody.contains("HOUSEKEEPTRACK - OPERATIONAL AUDIT TRAIL LOG REPORT"));
     }
 }

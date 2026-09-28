@@ -4,6 +4,7 @@ import com.hotel.housekeeptrack.dto.CreateRoomRequest;
 import com.hotel.housekeeptrack.exception.BusinessRuleException;
 import com.hotel.housekeeptrack.exception.InvalidRoomStateException;
 import com.hotel.housekeeptrack.exception.ResourceNotFoundException;
+import com.hotel.housekeeptrack.model.AuditAction;
 import com.hotel.housekeeptrack.model.Inspection;
 import com.hotel.housekeeptrack.model.InspectionResult;
 import com.hotel.housekeeptrack.model.Room;
@@ -11,6 +12,10 @@ import com.hotel.housekeeptrack.model.RoomStatus;
 import com.hotel.housekeeptrack.model.TaskPriority;
 import com.hotel.housekeeptrack.repository.InspectionRepository;
 import com.hotel.housekeeptrack.repository.RoomRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,31 +31,49 @@ public class RoomService {
     private final RoomRepository roomRepository;
     private final CleaningTaskService cleaningTaskService;
     private final InspectionRepository inspectionRepository;
+    private final AuditLogService auditLogService;
 
     public RoomService(RoomRepository roomRepository,
                        CleaningTaskService cleaningTaskService,
-                       InspectionRepository inspectionRepository) {
+                       InspectionRepository inspectionRepository,
+                       AuditLogService auditLogService) {
         this.roomRepository = roomRepository;
         this.cleaningTaskService = cleaningTaskService;
         this.inspectionRepository = inspectionRepository;
+        this.auditLogService = auditLogService;
     }
 
     @Transactional
+    @CacheEvict(value = {"rooms", "systemSummary"}, allEntries = true)
     public Room createRoom(CreateRoomRequest request) {
         if (roomRepository.existsByRoomNumber(request.getRoomNumber())) {
             throw new BusinessRuleException("Room number " + request.getRoomNumber() + " already exists.");
         }
         Room room = new Room(request.getRoomNumber(), request.getRoomType(), RoomStatus.READY);
         room.setReadyAt(LocalDateTime.now());
-        return roomRepository.save(room);
+        Room savedRoom = roomRepository.save(room);
+
+        auditLogService.log(AuditAction.ROOM_CREATED, "Room", savedRoom.getId(), "FrontDesk",
+                "Created " + savedRoom.getRoomType() + " room " + savedRoom.getRoomNumber());
+
+        return savedRoom;
     }
 
+    @Cacheable(value = "rooms")
     public List<Room> getAllRooms() {
         return roomRepository.findAll();
     }
 
+    @Cacheable(value = "rooms", key = "#status")
     public List<Room> getRoomsByStatus(RoomStatus status) {
         return roomRepository.findByStatus(status);
+    }
+
+    public Page<Room> getRoomsPaginated(RoomStatus status, Pageable pageable) {
+        if (status != null) {
+            return roomRepository.findByStatus(status, pageable);
+        }
+        return roomRepository.findAll(pageable);
     }
 
     public Room getRoomById(Long id) {
@@ -63,6 +86,7 @@ public class RoomService {
      * Auto-generates a NORMAL priority CleaningTask and triggers queue assignment.
      */
     @Transactional
+    @CacheEvict(value = {"rooms", "systemSummary", "roomTurnaround", "housekeeperWorkloads"}, allEntries = true)
     public Room checkOut(Long roomId) {
         Room room = getRoomById(roomId);
 
@@ -82,6 +106,9 @@ public class RoomService {
         // Automatically create cleaning task and dispatch
         cleaningTaskService.createAndDispatchTask(room, TaskPriority.NORMAL, "Guest checkout cleaning");
 
+        auditLogService.log(AuditAction.CHECKOUT, "Room", room.getId(), "FrontDesk",
+                "Guest checked out of room " + room.getRoomNumber());
+
         return roomRepository.findById(roomId).orElse(room);
     }
 
@@ -91,6 +118,7 @@ public class RoomService {
      * Prevents hotel guests from checking into dirty, uncleaned, or uninspected rooms.
      */
     @Transactional
+    @CacheEvict(value = {"rooms", "systemSummary"}, allEntries = true)
     public Room checkIn(Long roomId) {
         Room room = getRoomById(roomId);
 
@@ -100,7 +128,12 @@ public class RoomService {
         }
 
         room.setStatus(RoomStatus.OCCUPIED);
-        return roomRepository.save(room);
+        Room savedRoom = roomRepository.save(room);
+
+        auditLogService.log(AuditAction.CHECK_IN, "Room", savedRoom.getId(), "FrontDesk",
+                "Guest checked into room " + savedRoom.getRoomNumber());
+
+        return savedRoom;
     }
 
     /**
@@ -108,6 +141,7 @@ public class RoomService {
      * Room cannot transition to READY unless it is in the INSPECTED stage AND passed inspection.
      */
     @Transactional
+    @CacheEvict(value = {"rooms", "systemSummary", "roomTurnaround"}, allEntries = true)
     public Room markReady(Long roomId) {
         Room room = getRoomById(roomId);
 
@@ -123,7 +157,12 @@ public class RoomService {
 
         room.setStatus(RoomStatus.READY);
         room.setReadyAt(LocalDateTime.now());
-        return roomRepository.save(room);
+        Room savedRoom = roomRepository.save(room);
+
+        auditLogService.log(AuditAction.MARK_READY, "Room", savedRoom.getId(), "Supervisor",
+                "Room " + savedRoom.getRoomNumber() + " marked READY after passing inspection");
+
+        return savedRoom;
     }
 
     /**
@@ -132,6 +171,7 @@ public class RoomService {
      * and triggers queue dispatch.
      */
     @Transactional
+    @CacheEvict(value = {"rooms", "systemSummary", "roomTurnaround", "housekeeperWorkloads"}, allEntries = true)
     public Room sendBackToCleaning(Long roomId, String reason, String supervisorName) {
         Room room = getRoomById(roomId);
 
@@ -157,6 +197,9 @@ public class RoomService {
         // Auto-generate HIGH-priority re-cleaning task and dispatch
         String notes = "Re-cleaning Required: " + failureReason + " (Reported by " + supervisor + ")";
         cleaningTaskService.createAndDispatchTask(room, TaskPriority.HIGH, notes);
+
+        auditLogService.log(AuditAction.SEND_TO_CLEANING, "Room", room.getId(), supervisor,
+                "Room " + room.getRoomNumber() + " sent back to cleaning: " + failureReason);
 
         return roomRepository.findById(roomId).orElse(room);
     }

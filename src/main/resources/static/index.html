@@ -15,7 +15,7 @@
         }
 
         .container {
-            max-width: 1100px;
+            max-width: 1140px;
             margin: 0 auto;
             background-color: #ffffff;
             padding: 25px;
@@ -44,10 +44,16 @@
             margin: 0;
         }
 
-        .refresh-btn {
+        .header-actions {
             position: absolute;
             right: 0;
             top: 10px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .refresh-btn {
             background-color: #6c757d;
         }
 
@@ -199,7 +205,7 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            transition: background 0.15s;
+            transition: background 0.15s, transform 0.1s;
         }
 
         button:hover {
@@ -353,7 +359,113 @@
             font-size: 10px;
         }
 
-        /* Inspection Modal */
+        .badge-action {
+            background-color: #eef2f7;
+            color: #0056b3;
+            border: 1px solid #b8daff;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+            font-weight: bold;
+        }
+
+        /* Pagination Styles */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            padding-top: 8px;
+            border-top: 1px solid #e1e4e8;
+            font-size: 12px;
+            color: #555;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .pagination-nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .page-btn {
+            background-color: #fff;
+            color: #0056b3;
+            border: 1px solid #ccd0d5;
+            padding: 4px 10px;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.15s ease-in-out;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background-color: #e9ecef;
+            border-color: #0056b3;
+        }
+
+        .page-btn.active {
+            background-color: #0056b3;
+            color: #ffffff;
+            border-color: #004085;
+            font-weight: bold;
+        }
+
+        .page-btn:disabled {
+            color: #aaa;
+            border-color: #e1e4e8;
+            cursor: not-allowed;
+            background-color: #f8f9fa;
+        }
+
+        /* Blinking Page Number Alert Keyframe (Red-Amber Alert Pulse) */
+        @keyframes alertBlinkRedAmber {
+            0% {
+                background-color: #dc3545;
+                color: #ffffff;
+                border-color: #bd2130;
+                box-shadow: 0 0 10px rgba(220, 53, 69, 0.9), 0 0 4px rgba(220, 53, 69, 0.6);
+                transform: scale(1.04);
+            }
+
+            50% {
+                background-color: #ff9800;
+                color: #212529;
+                border-color: #e65100;
+                box-shadow: 0 0 16px rgba(255, 152, 0, 0.95), 0 0 6px rgba(255, 152, 0, 0.7);
+                transform: scale(1.12);
+            }
+
+            100% {
+                background-color: #dc3545;
+                color: #ffffff;
+                border-color: #bd2130;
+                box-shadow: 0 0 10px rgba(220, 53, 69, 0.9), 0 0 4px rgba(220, 53, 69, 0.6);
+                transform: scale(1.04);
+            }
+        }
+
+        .page-btn.page-alert-blink {
+            animation: alertBlinkRedAmber 1s infinite alternate ease-in-out !important;
+            font-weight: bold !important;
+            position: relative;
+            z-index: 2;
+        }
+
+        .page-btn.page-alert-blink::after {
+            content: "•";
+            position: absolute;
+            top: -7px;
+            right: -2px;
+            font-size: 16px;
+            color: #ffff00;
+        }
+
+        /* Modals */
         .modal {
             display: none;
             position: fixed;
@@ -392,6 +504,23 @@
             margin-top: 15px;
         }
 
+        .format-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border: 1px solid #ccd0d5;
+            border-radius: 5px;
+            background-color: #fafafa;
+            cursor: pointer;
+            transition: border-color 0.15s, background-color 0.15s;
+        }
+
+        .format-card:hover {
+            border-color: #0066cc;
+            background-color: #f0f7ff;
+        }
+
         footer {
             text-align: center;
             font-size: 12px;
@@ -408,8 +537,11 @@
     <div class="container">
         <header>
             <h1>HouseKeepTrack</h1>
-            <p class="subtitle">Hotel Room Lifecycle & Automated Housekeeping Management Portal </p>
-            <button class="refresh-btn" onclick="refreshAll()">&#x21bb; Refresh Data</button>
+            <p class="subtitle">Hotel Room Lifecycle & Automated Housekeeping Management Portal</p>
+            <div class="header-actions">
+                <button class="btn-sm btn-purple" onclick="openDownloadModal()"> Download Audit Logs</button>
+                <button class="refresh-btn btn-sm" onclick="refreshAll()">&#x21bb; Refresh Data</button>
+            </div>
         </header>
 
         <!-- Global Feedback Alert Banner -->
@@ -487,12 +619,20 @@
                     </tr>
                 </tbody>
             </table>
+            <div class="pagination-container" id="roomsPagination">
+                <span class="pagination-info" id="roomsPageInfo">Showing 0-0 of 0 rooms</span>
+                <div class="pagination-nav">
+                    <button class="page-btn" id="roomsPrevBtn" onclick="changeRoomsPage(-1)">« Prev</button>
+                    <span id="roomsPageNumbers" class="pagination-nav"></span>
+                    <button class="page-btn" id="roomsNextBtn" onclick="changeRoomsPage(1)">Next »</button>
+                </div>
+            </div>
         </div>
 
         <!-- 3. Active Cleaning Tasks & Priority Queue -->
         <div class="section-box">
             <h2>
-                2. Cleaning Tasks & Auto-Assignment Priority Queue
+                <span>2. Cleaning Tasks & Auto-Assignment Priority Queue</span>
                 <button class="btn-sm btn-teal" onclick="triggerQueueDispatch()">&#9654; Force Queue Dispatch</button>
             </h2>
             <div class="info-note">
@@ -519,6 +659,14 @@
                     </tr>
                 </tbody>
             </table>
+            <div class="pagination-container" id="tasksPagination">
+                <span class="pagination-info" id="tasksPageInfo">Showing 0-0 of 0 tasks</span>
+                <div class="pagination-nav">
+                    <button class="page-btn" id="tasksPrevBtn" onclick="changeTasksPage(-1)">« Prev</button>
+                    <span id="tasksPageNumbers" class="pagination-nav"></span>
+                    <button class="page-btn" id="tasksNextBtn" onclick="changeTasksPage(1)">Next »</button>
+                </div>
+            </div>
         </div>
 
         <!-- 4. Housekeeping Staff & Workload -->
@@ -563,6 +711,14 @@
                     </tr>
                 </tbody>
             </table>
+            <div class="pagination-container" id="staffPagination">
+                <span class="pagination-info" id="staffPageInfo">Showing 0-0 of 0 staff</span>
+                <div class="pagination-nav">
+                    <button class="page-btn" id="staffPrevBtn" onclick="changeStaffPage(-1)">« Prev</button>
+                    <span id="staffPageNumbers" class="pagination-nav"></span>
+                    <button class="page-btn" id="staffNextBtn" onclick="changeStaffPage(1)">Next »</button>
+                </div>
+            </div>
         </div>
 
         <!-- 5. Supervisor Inspection Log -->
@@ -585,10 +741,58 @@
                     </tr>
                 </tbody>
             </table>
+            <div class="pagination-container" id="inspectionsPagination">
+                <span class="pagination-info" id="inspectionsPageInfo">Showing 0-0 of 0 inspections</span>
+                <div class="pagination-nav">
+                    <button class="page-btn" id="inspectionsPrevBtn" onclick="changeInspectionsPage(-1)">« Prev</button>
+                    <span id="inspectionsPageNumbers" class="pagination-nav"></span>
+                    <button class="page-btn" id="inspectionsNextBtn" onclick="changeInspectionsPage(1)">Next »</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. Operational Audit Trail -->
+        <div class="section-box">
+            <h2>
+                <span>5. Operational Audit Trail & Accountability Log</span>
+                <button class="btn-sm btn-purple" onclick="openDownloadModal()"> Download Audit Logs</button>
+            </h2>
+            <div class="info-note">
+                <strong>Accountability & Change Tracking:</strong> Records chronological operational changes, actors,
+                entity targets,
+                and state events. Real-time updates alert you to changes on other pages.
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">ID</th>
+                        <th style="width: 155px;">Timestamp</th>
+                        <th style="width: 150px;">Action</th>
+                        <th style="width: 120px;">Entity</th>
+                        <th style="width: 120px;">Actor</th>
+                        <th>Event Details</th>
+                    </tr>
+                </thead>
+                <tbody id="auditTableBody">
+                    <tr>
+                        <td colspan="6" style="text-align:center;">Loading audit trail...</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="pagination-container" id="auditPagination">
+                <span class="pagination-info" id="auditPageInfo">Showing 0-0 of 0 audit logs</span>
+                <div class="pagination-nav">
+                    <button class="page-btn" id="auditPrevBtn" onclick="changeAuditPage(-1)">« Prev</button>
+                    <span id="auditPageNumbers" class="pagination-nav"></span>
+                    <button class="page-btn" id="auditNextBtn" onclick="changeAuditPage(1)">Next »</button>
+                </div>
+            </div>
         </div>
 
         <footer>
-            HouseKeepTrack Hotel Management System &bull; Spring Boot 3.4 &bull; Java 25 &bull; MySQL 8.0
+            HouseKeepTrack Hotel Management System &bull; Spring Boot 4.1 &bull; Java 25 &bull; Spring Cache &bull;
+            Operational Audit Logging
         </footer>
     </div>
 
@@ -623,8 +827,80 @@
         </div>
     </div>
 
+    <!-- Audit Log Format Picker Download Modal Dialog -->
+    <div id="downloadModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"> Download Audit Logs</div>
+            <p style="font-size: 13px; color: #555; margin-bottom: 16px;">
+                Select your preferred export format for operational records and compliance reporting:
+            </p>
+            <form id="downloadForm" onsubmit="submitDownload(event)">
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px;">
+                    <label class="format-card">
+                        <input type="radio" name="downloadFormat" value="md" checked>
+                        <div>
+                            <strong>Markdown Format (.md)</strong>
+                            <div style="font-size: 12px; color: #666; margin-top: 2px;">
+                                Formatted document with header summary, timestamps, and structured Markdown table.
+                            </div>
+                        </div>
+                    </label>
+                    <label class="format-card">
+                        <input type="radio" name="downloadFormat" value="txt">
+                        <div>
+                            <strong>Plain Text Format (.txt)</strong>
+                            <div style="font-size: 12px; color: #666; margin-top: 2px;">
+                                Standard monospace formatted chronological text log for system archiving.
+                            </div>
+                        </div>
+                    </label>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-sm" style="background:#6c757d;"
+                        onclick="closeDownloadModal()">Cancel</button>
+                    <button type="submit" class="btn-green">Download File</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         const API_BASE = '/api';
+        const PAGE_SIZE = 5;
+
+        // Data caches
+        let allRooms = [];
+        let allTasks = [];
+        let allStaff = [];
+        let allInspections = [];
+        let allAuditLogs = [];
+        let lastWorkMap = {};
+
+        // Current page states (1-indexed)
+        let roomsPage = 1;
+        let tasksPage = 1;
+        let staffPage = 1;
+        let inspectionsPage = 1;
+        let auditPage = 1;
+
+        // Unread alert pages set per table (for blinking page number alert)
+        const unreadAlertPages = {
+            rooms: new Set(),
+            tasks: new Set(),
+            staff: new Set(),
+            inspections: new Set(),
+            audit: new Set()
+        };
+
+        // Snapshot caches to detect changes on non-viewed pages
+        const previousSnapshots = {
+            rooms: {},
+            tasks: {},
+            staff: {},
+            inspectionsCount: 0,
+            auditMaxId: 0,
+            initialized: false
+        };
 
         // Show temporary alert banner
         function showAlert(message, isError = false) {
@@ -642,8 +918,10 @@
                 loadRooms(),
                 loadTasks(),
                 loadStaff(),
-                loadInspections()
+                loadInspections(),
+                loadAuditLogs()
             ]);
+            previousSnapshots.initialized = true;
         }
 
         // 1. Load Metrics
@@ -675,51 +953,141 @@
             }
         }
 
+        // Generic Pagination UI Renderer with Blinking Page Number Alert
+        function renderPagination(tableKey, totalItems, currentPage, onPageSelectFn) {
+            const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+            const prevBtn = document.getElementById(`${tableKey}PrevBtn`);
+            const nextBtn = document.getElementById(`${tableKey}NextBtn`);
+            const pageNumbersContainer = document.getElementById(`${tableKey}PageNumbers`);
+            const infoSpan = document.getElementById(`${tableKey}PageInfo`);
+
+            if (prevBtn) prevBtn.disabled = (currentPage <= 1);
+            if (nextBtn) nextBtn.disabled = (currentPage >= totalPages);
+
+            const startItem = totalItems === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1;
+            const endItem = Math.min(totalItems, currentPage * PAGE_SIZE);
+            if (infoSpan) {
+                infoSpan.textContent = `Showing ${startItem}-${endItem} of ${totalItems} (Page ${currentPage} of ${totalPages})`;
+            }
+
+            if (!pageNumbersContainer) return;
+            pageNumbersContainer.innerHTML = '';
+
+            // User is actively reading currentPage: clear unread alert for this page
+            unreadAlertPages[tableKey].delete(currentPage);
+
+            for (let p = 1; p <= totalPages; p++) {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.textContent = p;
+                btn.className = 'page-btn';
+
+                if (p === currentPage) {
+                    btn.classList.add('active');
+                } else if (unreadAlertPages[tableKey].has(p)) {
+                    // Blinking Page Number Alert: unread change on this non-current page!
+                    btn.classList.add('page-alert-blink');
+                    btn.title = 'Unread activity or status update on this page!';
+                }
+
+                btn.onclick = () => {
+                    unreadAlertPages[tableKey].delete(p);
+                    onPageSelectFn(p);
+                };
+
+                pageNumbersContainer.appendChild(btn);
+            }
+        }
+
         // 2. Load Rooms
         async function loadRooms() {
-            const tbody = document.getElementById('roomsTableBody');
             try {
                 const res = await fetch(`${API_BASE}/rooms`);
                 if (!res.ok) throw new Error('Failed to fetch rooms');
-                const rooms = await res.json();
+                allRooms = await res.json();
 
-                // Update room breakdown in metric card
+                // Metric Card Breakdown
                 const counts = {};
-                rooms.forEach(r => { counts[r.status] = (counts[r.status] || 0) + 1; });
+                allRooms.forEach(r => { counts[r.status] = (counts[r.status] || 0) + 1; });
                 const breakdownStr = Object.keys(counts).map(k => `${k}: ${counts[k]}`).join(', ');
                 document.getElementById('metricRoomBreakdown').textContent = breakdownStr || 'No rooms registered';
 
-                if (rooms.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No rooms found. Add a room above.</td></tr>';
-                    return;
+                // Detect changes on non-current pages for blinking alert
+                if (previousSnapshots.initialized) {
+                    allRooms.forEach((r, idx) => {
+                        const targetPage = Math.floor(idx / PAGE_SIZE) + 1;
+                        const prevStatus = previousSnapshots.rooms[r.id];
+                        if (prevStatus === undefined || prevStatus !== r.status) {
+                            if (targetPage !== roomsPage) {
+                                unreadAlertPages.rooms.add(targetPage);
+                            }
+                        }
+                    });
                 }
+                // Save snapshot
+                previousSnapshots.rooms = {};
+                allRooms.forEach(r => { previousSnapshots.rooms[r.id] = r.status; });
 
-                tbody.innerHTML = rooms.map(r => {
-                    const statusClass = `badge-${r.status.toLowerCase()}`;
-                    let timeline = [];
-                    if (r.dirtyAt) timeline.push(`Dirty: ${formatTime(r.dirtyAt)}`);
-                    if (r.readyAt) timeline.push(`Ready: ${formatTime(r.readyAt)}`);
-                    const timelineStr = timeline.length > 0 ? timeline.join(' | ') : 'Newly Registered';
+                // Ensure current page is valid
+                const maxPage = Math.max(1, Math.ceil(allRooms.length / PAGE_SIZE));
+                if (roomsPage > maxPage) roomsPage = maxPage;
 
-                    let actionButtons = '';
-                    if (r.status === 'READY') {
-                        actionButtons = `<button class="btn-sm btn-green" onclick="checkInRoom(${r.id})">Guest Check-In</button>`;
-                    } else if (r.status === 'OCCUPIED') {
-                        actionButtons = `<button class="btn-sm btn-orange" onclick="checkoutRoom(${r.id})">Guest Checkout</button>`;
-                    } else if (r.status === 'CLEANED') {
-                        actionButtons = `<button class="btn-sm btn-purple" onclick="openInspectionModal(${r.id}, '${r.roomNumber}')">Inspect Room</button>`;
-                    } else if (r.status === 'INSPECTED') {
-                        actionButtons = `
+                renderRoomsTable();
+                renderPagination('rooms', allRooms.length, roomsPage, setRoomsPage);
+            } catch (err) {
+                document.getElementById('roomsTableBody').innerHTML =
+                    `<tr><td colspan="6" style="color:red; text-align:center;">Error: ${err.message}</td></tr>`;
+            }
+        }
+
+        function setRoomsPage(p) {
+            roomsPage = p;
+            renderRoomsTable();
+            renderPagination('rooms', allRooms.length, roomsPage, setRoomsPage);
+        }
+
+        function changeRoomsPage(delta) {
+            const maxPage = Math.max(1, Math.ceil(allRooms.length / PAGE_SIZE));
+            const newPage = Math.max(1, Math.min(maxPage, roomsPage + delta));
+            if (newPage !== roomsPage) {
+                setRoomsPage(newPage);
+            }
+        }
+
+        function renderRoomsTable() {
+            const tbody = document.getElementById('roomsTableBody');
+            if (allRooms.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No rooms found. Add a room above.</td></tr>';
+                return;
+            }
+
+            const pageRooms = allRooms.slice((roomsPage - 1) * PAGE_SIZE, roomsPage * PAGE_SIZE);
+            tbody.innerHTML = pageRooms.map(r => {
+                const statusClass = `badge-${r.status.toLowerCase()}`;
+                let timeline = [];
+                if (r.dirtyAt) timeline.push(`Dirty: ${formatTime(r.dirtyAt)}`);
+                if (r.readyAt) timeline.push(`Ready: ${formatTime(r.readyAt)}`);
+                const timelineStr = timeline.length > 0 ? timeline.join(' | ') : 'Newly Registered';
+
+                let actionButtons = '';
+                if (r.status === 'READY') {
+                    actionButtons = `<button class="btn-sm btn-green" onclick="checkInRoom(${r.id})">Guest Check-In</button>`;
+                } else if (r.status === 'OCCUPIED') {
+                    actionButtons = `<button class="btn-sm btn-orange" onclick="checkoutRoom(${r.id})">Guest Checkout</button>`;
+                } else if (r.status === 'CLEANED') {
+                    actionButtons = `<button class="btn-sm btn-purple" onclick="openInspectionModal(${r.id}, '${r.roomNumber}')">Inspect Room</button>`;
+                } else if (r.status === 'INSPECTED') {
+                    actionButtons = `
                         <button class="btn-sm btn-green" onclick="markRoomReady(${r.id})">Mark READY</button>
                         <button class="btn-sm btn-red" onclick="sendBackToCleaning(${r.id})">Send to Cleaning</button>
                     `;
-                    } else if (r.status === 'DIRTY' || r.status === 'IN_CLEANING') {
-                        actionButtons = `
+                } else if (r.status === 'DIRTY' || r.status === 'IN_CLEANING') {
+                    actionButtons = `
                         <button class="btn-sm" style="background:#888;" onclick="checkInRoom(${r.id})" title="Will test barrier invariant">Test Check-In</button>
                     `;
-                    }
+                }
 
-                    return `
+                return `
                     <tr>
                         <td>${r.id}</td>
                         <td><strong>Room ${r.roomNumber}</strong></td>
@@ -729,10 +1097,7 @@
                         <td>${actionButtons}</td>
                     </tr>
                 `;
-                }).join('');
-            } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="6" style="color:red; text-align:center;">Error: ${err.message}</td></tr>`;
-            }
+            }).join('');
         }
 
         // Create Room
@@ -809,31 +1174,72 @@
 
         // 3. Load Tasks
         async function loadTasks() {
-            const tbody = document.getElementById('tasksTableBody');
             try {
                 const res = await fetch(`${API_BASE}/tasks`);
                 if (!res.ok) throw new Error('Failed to load tasks');
-                const tasks = await res.json();
-                if (tasks.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No cleaning tasks recorded.</td></tr>';
-                    return;
+                allTasks = await res.json();
+
+                // Detect changes for blinking alert
+                if (previousSnapshots.initialized) {
+                    allTasks.forEach((t, idx) => {
+                        const targetPage = Math.floor(idx / PAGE_SIZE) + 1;
+                        const prev = previousSnapshots.tasks[t.id];
+                        if (!prev || prev.status !== t.status || prev.priority !== t.priority) {
+                            if (targetPage !== tasksPage) {
+                                unreadAlertPages.tasks.add(targetPage);
+                            }
+                        }
+                    });
+                }
+                previousSnapshots.tasks = {};
+                allTasks.forEach(t => { previousSnapshots.tasks[t.id] = { status: t.status, priority: t.priority }; });
+
+                const maxPage = Math.max(1, Math.ceil(allTasks.length / PAGE_SIZE));
+                if (tasksPage > maxPage) tasksPage = maxPage;
+
+                renderTasksTable();
+                renderPagination('tasks', allTasks.length, tasksPage, setTasksPage);
+            } catch (err) {
+                document.getElementById('tasksTableBody').innerHTML =
+                    `<tr><td colspan="7" style="color:red; text-align:center;">Error: ${err.message}</td></tr>`;
+            }
+        }
+
+        function setTasksPage(p) {
+            tasksPage = p;
+            renderTasksTable();
+            renderPagination('tasks', allTasks.length, tasksPage, setTasksPage);
+        }
+
+        function changeTasksPage(delta) {
+            const maxPage = Math.max(1, Math.ceil(allTasks.length / PAGE_SIZE));
+            const newPage = Math.max(1, Math.min(maxPage, tasksPage + delta));
+            if (newPage !== tasksPage) setTasksPage(newPage);
+        }
+
+        function renderTasksTable() {
+            const tbody = document.getElementById('tasksTableBody');
+            if (allTasks.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No cleaning tasks recorded.</td></tr>';
+                return;
+            }
+
+            const pageTasks = allTasks.slice((tasksPage - 1) * PAGE_SIZE, tasksPage * PAGE_SIZE);
+            tbody.innerHTML = pageTasks.map(t => {
+                const priorityBadge = t.priority === 'HIGH'
+                    ? '<span class="badge-priority-high">&#9888; HIGH</span>'
+                    : '<span class="badge-priority-normal">NORMAL</span>';
+
+                let actionBtn = '-';
+                if (t.status === 'IN_PROGRESS') {
+                    actionBtn = `<button class="btn-sm btn-green" onclick="completeTask(${t.id})">Complete Cleaning</button>`;
+                } else if (t.status === 'PENDING') {
+                    actionBtn = `<span style="color:#d9534f; font-weight:bold; font-size:12px;">Queued (Waiting)</span>`;
+                } else if (t.status === 'COMPLETED') {
+                    actionBtn = `<span style="color:#28a745; font-size:12px;">Done (${formatTime(t.completedAt)})</span>`;
                 }
 
-                tbody.innerHTML = tasks.map(t => {
-                    const priorityBadge = t.priority === 'HIGH'
-                        ? '<span class="badge-priority-high">&#9888; HIGH</span>'
-                        : '<span class="badge-priority-normal">NORMAL</span>';
-
-                    let actionBtn = '-';
-                    if (t.status === 'IN_PROGRESS') {
-                        actionBtn = `<button class="btn-sm btn-green" onclick="completeTask(${t.id})">Complete Cleaning</button>`;
-                    } else if (t.status === 'PENDING') {
-                        actionBtn = `<span style="color:#d9534f; font-weight:bold; font-size:12px;">Queued (Waiting)</span>`;
-                    } else if (t.status === 'COMPLETED') {
-                        actionBtn = `<span style="color:#28a745; font-size:12px;">Done (${formatTime(t.completedAt)})</span>`;
-                    }
-
-                    return `
+                return `
                     <tr>
                         <td>${t.id}</td>
                         <td><strong>Room ${t.roomNumber}</strong></td>
@@ -844,10 +1250,7 @@
                         <td>${actionBtn}</td>
                     </tr>
                 `;
-                }).join('');
-            } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="7" style="color:red; text-align:center;">Error: ${err.message}</td></tr>`;
-            }
+            }).join('');
         }
 
         async function completeTask(id) {
@@ -875,42 +1278,83 @@
 
         // 4. Load Housekeepers
         async function loadStaff() {
-            const tbody = document.getElementById('staffTableBody');
             try {
                 const [staffRes, workRes] = await Promise.all([
                     fetch(`${API_BASE}/housekeepers`),
                     fetch(`${API_BASE}/metrics/housekeepers`)
                 ]);
                 if (!staffRes.ok) throw new Error('Failed to load staff');
-                const staffList = await staffRes.json();
+                allStaff = await staffRes.json();
                 const workloads = workRes.ok ? await workRes.json() : [];
                 const workMap = {};
                 workloads.forEach(w => { workMap[w.housekeeperId] = w; });
+                lastWorkMap = workMap;
 
-                const availCount = staffList.filter(s => s.status === 'AVAILABLE').length;
+                const availCount = allStaff.filter(s => s.status === 'AVAILABLE').length;
                 document.getElementById('metricStaffAvailable').textContent = `${availCount} Available`;
 
-                if (staffList.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No housekeeping staff registered. Add staff above.</td></tr>';
-                    return;
+                // Detect status changes for blinking alert
+                if (previousSnapshots.initialized) {
+                    allStaff.forEach((s, idx) => {
+                        const targetPage = Math.floor(idx / PAGE_SIZE) + 1;
+                        const prevStatus = previousSnapshots.staff[s.id];
+                        if (prevStatus === undefined || prevStatus !== s.status) {
+                            if (targetPage !== staffPage) {
+                                unreadAlertPages.staff.add(targetPage);
+                            }
+                        }
+                    });
+                }
+                previousSnapshots.staff = {};
+                allStaff.forEach(s => { previousSnapshots.staff[s.id] = s.status; });
+
+                const maxPage = Math.max(1, Math.ceil(allStaff.length / PAGE_SIZE));
+                if (staffPage > maxPage) staffPage = maxPage;
+
+                renderStaffTable(lastWorkMap);
+                renderPagination('staff', allStaff.length, staffPage, setStaffPage);
+            } catch (err) {
+                document.getElementById('staffTableBody').innerHTML =
+                    `<tr><td colspan="8" style="color:red; text-align:center;">Error: ${err.message}</td></tr>`;
+            }
+        }
+
+        function setStaffPage(p) {
+            staffPage = p;
+            renderStaffTable(lastWorkMap);
+            renderPagination('staff', allStaff.length, staffPage, setStaffPage);
+        }
+
+        function changeStaffPage(delta) {
+            const maxPage = Math.max(1, Math.ceil(allStaff.length / PAGE_SIZE));
+            const newPage = Math.max(1, Math.min(maxPage, staffPage + delta));
+            if (newPage !== staffPage) setStaffPage(newPage);
+        }
+
+        function renderStaffTable(workMap = lastWorkMap) {
+            const tbody = document.getElementById('staffTableBody');
+            if (allStaff.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No housekeeping staff registered. Add staff above.</td></tr>';
+                return;
+            }
+
+            const pageStaff = allStaff.slice((staffPage - 1) * PAGE_SIZE, staffPage * PAGE_SIZE);
+            tbody.innerHTML = pageStaff.map(s => {
+                const w = workMap[s.id] || {};
+                const avgMin = w.avgTurnaroundMinutes !== null && w.avgTurnaroundMinutes !== undefined
+                    ? `${w.avgTurnaroundMinutes.toFixed(1)} min`
+                    : 'N/A';
+
+                let toggleBtn = '';
+                if (s.status === 'AVAILABLE') {
+                    toggleBtn = `<button class="btn-sm btn-orange" onclick="updateStaffStatus(${s.id}, 'OFFLINE')">Go OFFLINE</button>`;
+                } else if (s.status === 'OFFLINE') {
+                    toggleBtn = `<button class="btn-sm btn-green" onclick="updateStaffStatus(${s.id}, 'AVAILABLE')">Go AVAILABLE</button>`;
+                } else if (s.status === 'BUSY') {
+                    toggleBtn = `<span style="font-size:12px; color:#e36a05;">Busy on task</span>`;
                 }
 
-                tbody.innerHTML = staffList.map(s => {
-                    const w = workMap[s.id] || {};
-                    const avgMin = w.avgTurnaroundMinutes !== null && w.avgTurnaroundMinutes !== undefined
-                        ? `${w.avgTurnaroundMinutes.toFixed(1)} min`
-                        : 'N/A';
-
-                    let toggleBtn = '';
-                    if (s.status === 'AVAILABLE') {
-                        toggleBtn = `<button class="btn-sm btn-orange" onclick="updateStaffStatus(${s.id}, 'OFFLINE')">Go OFFLINE</button>`;
-                    } else if (s.status === 'OFFLINE') {
-                        toggleBtn = `<button class="btn-sm btn-green" onclick="updateStaffStatus(${s.id}, 'AVAILABLE')">Go AVAILABLE</button>`;
-                    } else if (s.status === 'BUSY') {
-                        toggleBtn = `<span style="font-size:12px; color:#e36a05;">Busy on task</span>`;
-                    }
-
-                    return `
+                return `
                     <tr>
                         <td>${s.id}</td>
                         <td><strong>${s.name}</strong></td>
@@ -922,10 +1366,7 @@
                         <td>${toggleBtn}</td>
                     </tr>
                 `;
-                }).join('');
-            } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="8" style="color:red; text-align:center;">Error: ${err.message}</td></tr>`;
-            }
+            }).join('');
         }
 
         async function createHousekeeper(e) {
@@ -969,35 +1410,134 @@
 
         // 5. Load Inspections
         async function loadInspections() {
-            const tbody = document.getElementById('inspectionsTableBody');
             try {
                 const res = await fetch(`${API_BASE}/inspections`);
                 if (!res.ok) throw new Error('Failed to load inspections');
-                const list = await res.json();
-                if (list.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No inspections recorded yet.</td></tr>';
-                    return;
-                }
+                allInspections = await res.json();
+                // Sort descending so newest inspections are displayed first (matching audit logs)
+                allInspections.sort((a, b) => (b.id || 0) - (a.id || 0));
 
-                tbody.innerHTML = list.map(i => {
-                    const isPassed = i.result === 'PASSED';
-                    const badge = isPassed
-                        ? '<span class="badge badge-ready">&#10004; PASSED</span>'
-                        : '<span class="badge badge-dirty">&#10008; FAILED</span>';
-                    return `
+                if (previousSnapshots.initialized && allInspections.length > previousSnapshots.inspectionsCount) {
+                    if (inspectionsPage !== 1) {
+                        unreadAlertPages.inspections.add(1);
+                    }
+                }
+                previousSnapshots.inspectionsCount = allInspections.length;
+
+                const maxPage = Math.max(1, Math.ceil(allInspections.length / PAGE_SIZE));
+                if (inspectionsPage > maxPage) inspectionsPage = maxPage;
+
+                renderInspectionsTable();
+                renderPagination('inspections', allInspections.length, inspectionsPage, setInspectionsPage);
+            } catch (err) {
+                document.getElementById('inspectionsTableBody').innerHTML =
+                    `<tr><td colspan="6" style="color:red; text-align:center;">Error: ${err.message}</td></tr>`;
+            }
+        }
+
+        function setInspectionsPage(p) {
+            inspectionsPage = p;
+            renderInspectionsTable();
+            renderPagination('inspections', allInspections.length, inspectionsPage, setInspectionsPage);
+        }
+
+        function changeInspectionsPage(delta) {
+            const maxPage = Math.max(1, Math.ceil(allInspections.length / PAGE_SIZE));
+            const newPage = Math.max(1, Math.min(maxPage, inspectionsPage + delta));
+            if (newPage !== inspectionsPage) setInspectionsPage(newPage);
+        }
+
+        function renderInspectionsTable() {
+            const tbody = document.getElementById('inspectionsTableBody');
+            if (allInspections.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No inspections recorded yet.</td></tr>';
+                return;
+            }
+
+            const pageItems = allInspections.slice((inspectionsPage - 1) * PAGE_SIZE, inspectionsPage * PAGE_SIZE);
+            tbody.innerHTML = pageItems.map(i => {
+                const isPassed = i.result === 'PASSED';
+                const badge = isPassed
+                    ? '<span class="badge badge-ready">&#10004; PASSED</span>'
+                    : '<span class="badge badge-dirty">&#10008; FAILED</span>';
+                const remarks = i.failureReason || i.comments || '-';
+                return `
                     <tr>
                         <td>${i.id}</td>
                         <td><strong>Room ${i.roomNumber}</strong></td>
                         <td>${i.supervisorName}</td>
                         <td>${badge}</td>
-                        <td>${i.comments || '-'}</td>
+                        <td>${remarks}</td>
                         <td>${formatTime(i.inspectedAt)}</td>
                     </tr>
                 `;
-                }).join('');
+            }).join('');
+        }
+
+        // 6. Load Audit Logs (5 per page with download and blinking alerts)
+        async function loadAuditLogs() {
+            try {
+                // Fetch up to 100 recent logs to support client-side pagination and alert diffing
+                const res = await fetch(`${API_BASE}/audit-logs?size=100&sort=timestamp,desc`);
+                if (!res.ok) throw new Error('Failed to load audit logs');
+                const pageData = await res.json();
+                allAuditLogs = pageData.content || [];
+
+                // Detect new incoming audit logs
+                if (allAuditLogs.length > 0) {
+                    const currentMaxId = allAuditLogs.reduce((max, l) => (l.id > max ? l.id : max), 0);
+                    if (previousSnapshots.initialized && currentMaxId > previousSnapshots.auditMaxId) {
+                        // New logs inserted at page 1: if user is on another page, blink page 1!
+                        if (auditPage !== 1) {
+                            unreadAlertPages.audit.add(1);
+                        }
+                    }
+                    previousSnapshots.auditMaxId = currentMaxId;
+                }
+
+                const maxPage = Math.max(1, Math.ceil(allAuditLogs.length / PAGE_SIZE));
+                if (auditPage > maxPage) auditPage = maxPage;
+
+                renderAuditTable();
+                renderPagination('audit', allAuditLogs.length, auditPage, setAuditPage);
             } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="6" style="color:red; text-align:center;">Error: ${err.message}</td></tr>`;
+                document.getElementById('auditTableBody').innerHTML =
+                    `<tr><td colspan="6" style="color:red; text-align:center;">Error: ${err.message}</td></tr>`;
             }
+        }
+
+        function setAuditPage(p) {
+            auditPage = p;
+            renderAuditTable();
+            renderPagination('audit', allAuditLogs.length, auditPage, setAuditPage);
+        }
+
+        function changeAuditPage(delta) {
+            const maxPage = Math.max(1, Math.ceil(allAuditLogs.length / PAGE_SIZE));
+            const newPage = Math.max(1, Math.min(maxPage, auditPage + delta));
+            if (newPage !== auditPage) setAuditPage(newPage);
+        }
+
+        function renderAuditTable() {
+            const tbody = document.getElementById('auditTableBody');
+            if (allAuditLogs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No audit log events recorded yet.</td></tr>';
+                return;
+            }
+
+            const pageLogs = allAuditLogs.slice((auditPage - 1) * PAGE_SIZE, auditPage * PAGE_SIZE);
+            tbody.innerHTML = pageLogs.map(log => {
+                return `
+                    <tr>
+                        <td>${log.id}</td>
+                        <td><small style="color:#555;">${formatDateTime(log.timestamp)}</small></td>
+                        <td><span class="badge-action">${log.action}</span></td>
+                        <td>${log.entityType} #${log.entityId}</td>
+                        <td><strong>${log.actor}</strong></td>
+                        <td>${log.details || '-'}</td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         // Inspection Modal Logic
@@ -1044,7 +1584,7 @@
                 const res = await fetch(`${API_BASE}/rooms/${roomId}/inspections`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ supervisorName, result, comments })
+                    body: JSON.stringify({ supervisorName, result, failureReason: comments })
                 });
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.message || 'Inspection failed');
@@ -1060,11 +1600,51 @@
             }
         }
 
+        // Single Download Button & Modal Logic
+        function openDownloadModal() {
+            document.getElementById('downloadModal').style.display = 'flex';
+        }
+
+        function closeDownloadModal() {
+            document.getElementById('downloadModal').style.display = 'none';
+        }
+
+        function submitDownload(e) {
+            e.preventDefault();
+            const selectedFormat = document.querySelector('input[name="downloadFormat"]:checked').value;
+            closeDownloadModal();
+
+            // Trigger direct file download
+            const downloadUrl = `${API_BASE}/audit-logs/download?format=${selectedFormat}`;
+            window.location.href = downloadUrl;
+            showAlert(`Audit log download initiated (${selectedFormat.toUpperCase()} format).`);
+        }
+
         function formatTime(isoStr) {
             if (!isoStr) return '-';
             const d = new Date(isoStr);
             return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
         }
+
+        function formatDateTime(isoStr) {
+            if (!isoStr) return '-';
+            const d = new Date(isoStr);
+            const dateStr = d.toLocaleDateString([], { year: 'numeric', month: '2-digit', day: '2-digit' });
+            const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            return `${dateStr} ${timeStr}`;
+        }
+
+        // Close modal when clicking on background outside modal-content
+        window.onclick = function (event) {
+            const inspModal = document.getElementById('inspectionModal');
+            const dlModal = document.getElementById('downloadModal');
+            if (event.target === inspModal) {
+                closeInspectionModal();
+            }
+            if (event.target === dlModal) {
+                closeDownloadModal();
+            }
+        };
 
         // Initial Load & Auto-polling every 12 seconds
         window.addEventListener('DOMContentLoaded', () => {

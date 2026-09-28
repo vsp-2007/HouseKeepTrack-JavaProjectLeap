@@ -6,6 +6,7 @@ import com.hotel.housekeeptrack.exception.ResourceNotFoundException;
 import com.hotel.housekeeptrack.model.*;
 import com.hotel.housekeeptrack.repository.InspectionRepository;
 import com.hotel.housekeeptrack.repository.RoomRepository;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,7 +15,7 @@ import java.util.List;
 
 /**
  * Service managing room inspections, dual-path outcome processing,
- * and high-priority re-cleaning loops upon failure.
+ * high-priority re-cleaning loops upon failure, and audit logging.
  */
 @Service
 public class InspectionService {
@@ -22,13 +23,16 @@ public class InspectionService {
     private final InspectionRepository inspectionRepository;
     private final RoomRepository roomRepository;
     private final CleaningTaskService cleaningTaskService;
+    private final AuditLogService auditLogService;
 
     public InspectionService(InspectionRepository inspectionRepository,
                              RoomRepository roomRepository,
-                             CleaningTaskService cleaningTaskService) {
+                             CleaningTaskService cleaningTaskService,
+                             AuditLogService auditLogService) {
         this.inspectionRepository = inspectionRepository;
         this.roomRepository = roomRepository;
         this.cleaningTaskService = cleaningTaskService;
+        this.auditLogService = auditLogService;
     }
 
     /**
@@ -38,6 +42,7 @@ public class InspectionService {
      *                  and immediately triggers priority dispatch.
      */
     @Transactional
+    @CacheEvict(value = {"rooms", "systemSummary", "roomTurnaround", "housekeeperWorkloads"}, allEntries = true)
     public Inspection inspectRoom(Long roomId, CreateInspectionRequest request) {
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new ResourceNotFoundException("Room not found with ID: " + roomId));
@@ -62,6 +67,11 @@ public class InspectionService {
             // Path 1: Pass inspection -> Room enters INSPECTED status (eligible for READY)
             room.setStatus(RoomStatus.INSPECTED);
             roomRepository.save(room);
+
+            auditLogService.log(AuditAction.INSPECTION_PASSED, "Inspection", inspection.getId(),
+                    request.getSupervisorName(),
+                    "Inspection PASSED for room " + room.getRoomNumber() +
+                            (request.getFailureReason() != null ? " - " + request.getFailureReason() : ""));
         } else {
             // Path 2: Fail inspection -> Room reverts to DIRTY, dirtyAt resets, HIGH-priority re-cleaning task created
             room.setStatus(RoomStatus.DIRTY);
@@ -70,6 +80,11 @@ public class InspectionService {
 
             String notes = "Inspection Failed: " + (request.getFailureReason() != null ? request.getFailureReason() : "Improper cleaning reported by " + request.getSupervisorName());
             cleaningTaskService.createAndDispatchTask(room, TaskPriority.HIGH, notes);
+
+            auditLogService.log(AuditAction.INSPECTION_FAILED, "Inspection", inspection.getId(),
+                    request.getSupervisorName(),
+                    "Inspection FAILED for room " + room.getRoomNumber() + ": " +
+                            (request.getFailureReason() != null ? request.getFailureReason() : "Improper cleaning"));
         }
 
         return inspection;

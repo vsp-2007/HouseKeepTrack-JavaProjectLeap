@@ -35,6 +35,9 @@ class CleaningTaskServiceTest {
     @Mock
     private RoomRepository roomRepository;
 
+    @Mock
+    private AuditLogService auditLogService;
+
     @InjectMocks
     private CleaningTaskService cleaningTaskService;
 

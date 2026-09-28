@@ -7,6 +7,7 @@ import com.hotel.housekeeptrack.model.*;
 import com.hotel.housekeeptrack.repository.CleaningTaskRepository;
 import com.hotel.housekeeptrack.repository.HousekeeperRepository;
 import com.hotel.housekeeptrack.repository.RoomRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -37,6 +38,7 @@ public class MetricsService {
     /**
      * Calculates workload and average cleaning turnaround time per housekeeper.
      */
+    @Cacheable("housekeeperWorkloads")
     public List<HousekeeperWorkloadDto> getHousekeeperWorkloadMetrics() {
         List<Housekeeper> housekeepers = housekeeperRepository.findAll();
         List<CleaningTask> completedTasks = cleaningTaskRepository.findCompletedTasks();
@@ -71,6 +73,7 @@ public class MetricsService {
     /**
      * Calculates overall room turnaround time (from dirtyAt to readyAt).
      */
+    @Cacheable("roomTurnaround")
     public List<RoomTurnaroundDto> getRoomTurnaroundMetrics() {
         List<Room> rooms = roomRepository.findAll();
 
@@ -97,6 +100,7 @@ public class MetricsService {
     /**
      * Aggregate system summary report.
      */
+    @Cacheable("systemSummary")
     public SystemSummaryDto getSystemSummary() {
         SystemSummaryDto summary = new SystemSummaryDto();
 

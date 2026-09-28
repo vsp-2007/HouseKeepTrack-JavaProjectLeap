@@ -115,7 +115,40 @@ for writemode any issues are design implemented changes report here {
    - System summary endpoint delivers aggregate metrics.
    - GlobalExceptionHandler (@RestControllerAdvice) formats all errors into clean ApiErrorResponse JSON payloads for ResourceNotFoundException, InvalidRoomStateException, BusinessRuleException, MethodArgumentNotValidException, IllegalArgumentException, HttpMessageNotReadableException, MethodArgumentTypeMismatchException, and OptimisticLockingFailureException.
 
-5. Test Verification:
-   - Thorough unit and integration tests across 8 test suites (HouseKeepTrackIntegrationTest, RoomServiceTest, InspectionServiceTest, CleaningTaskServiceTest, HousekeeperServiceTest, MetricsServiceTest, RoomPresenterTest, GlobalExceptionHandlerTest).
-   - Fully covers lifecycle, allocation barrier, failed inspection re-cleaning loop, priority queue dispatch, wait-time escalation, housekeeper offline reassignment, and metrics.
+5. Audit Logging Domain & Multi-Format Download Export:
+   - Domain Model:
+     * `AuditLog` entity: id, timestamp (LocalDateTime), action (`AuditAction`: ROOM_CREATED, CHECK_IN, CHECKOUT, MARK_READY, SEND_TO_CLEANING, TASK_ASSIGNED, TASK_COMPLETED, INSPECTION_PASSED, INSPECTION_FAILED, STAFF_REGISTERED, STAFF_STATUS_CHANGED), entityType, entityId, actor, details.
+     * `AuditLogRepository`: extends JpaRepository<AuditLog, Long> with Pageable support, findAllByOrderByTimestampAsc(), and findAllByOrderByTimestampDesc(Pageable).
+     * `AuditLogService`: captures operational events, provides paginated access, generates Markdown (.md with formatted table) and Plain Text (.txt monospace log) exports.
+     * Hooks: RoomService (ROOM_CREATED, CHECK_IN, CHECKOUT, MARK_READY, SEND_TO_CLEANING), CleaningTaskService (TASK_ASSIGNED, TASK_COMPLETED), InspectionService (INSPECTION_PASSED, INSPECTION_FAILED), HousekeeperService (STAFF_REGISTERED, STAFF_STATUS_CHANGED).
+   - REST Controllers & Presenters:
+     * `AuditLogPresenter` & `AuditLogController`:
+       - `GET /api/audit-logs`: returns Page<AuditLogResponse> (default size=5, sorted descending by timestamp).
+       - `GET /api/audit-logs/download?format=md|txt`: returns downloadable attachment `housekeeptrack-audit-log-YYYYMMDD_HHmmss.[md|txt]` with `text/markdown` or `text/plain` Content-Type.
+
+6. Performance Caching & Pagination/Sorting:
+   - Spring Cache: Added `spring-boot-starter-cache` dependency and `@EnableCaching` on `HouseKeepTrackApplication`.
+   - Cached Read Endpoints: `@Cacheable` on `/api/metrics/summary` (systemSummary), `/api/rooms` (rooms), `/api/metrics/housekeepers` (housekeeperWorkloads), and `/api/metrics/room-turnaround` (roomTurnaround).
+   - Fine-grained Cache Eviction: `@CacheEvict(allEntries = true)` on all mutating methods across RoomService, CleaningTaskService, InspectionService, and HousekeeperService.
+   - Pagination & Sorting: Added Pageable and Sort support on RoomRepository, RoomService, RoomController, AuditLogRepository, and AuditLogController.
+
+7. Frontend UI Enhancements (index.html):
+   - Single Download Button: " Download Audit Logs" in portal header and Audit section, launching a format picker modal asking for Markdown (.md) or Plain Text (.txt), triggering direct file download with formatted timestamp filenames.
+   - 5-Item Table Pagination: Max 5 entries per page for Rooms, Cleaning Tasks, Housekeeper Staff, Supervisor Inspections, and Audit Logs with [« Prev] [ 1 ] [ 2 ] [Next »] controls and item ranges.
+   - Blinking Page Number Alert: Keyframes pulse/blink animation (@keyframes alertBlinkRedAmber in red-amber with glowing indicator) on page number buttons when unread changes occur on non-viewed pages (status changes, task queues, staff availability, or new audit entries), automatically extinguished once user navigates to and reads that page.
+   - Operational Audit Trail Section: Displays recent audit logs paginated 5 per page with color-coded action badges, actor, entity ID, and event details.
+
+8. Test Verification:
+   - Comprehensive test coverage across 10 test suites:
+     * AuditLogServiceTest (4 tests)
+     * AuditLogControllerTest (4 tests)
+     * HouseKeepTrackIntegrationTest (7 tests)
+     * RoomServiceTest (13 tests)
+     * CleaningTaskServiceTest (5 tests)
+     * HousekeeperServiceTest (6 tests)
+     * InspectionServiceTest (5 tests)
+     * MetricsServiceTest (3 tests)
+     * RoomPresenterTest (2 tests)
+     * GlobalExceptionHandlerTest (6 tests)
+   - Total Tests Run: 55, Failures: 0, Errors: 0, Skipped: 0. Status: BUILD SUCCESS (`mvn clean test`).
 }

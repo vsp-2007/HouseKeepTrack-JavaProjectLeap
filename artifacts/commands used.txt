@@ -7,3 +7,7 @@
 .
 .
 create a frontend that connects to this backend .use html,css,js.make it a simpler ui similar to this  <pastedpath>
+
+implement a download log feature which should download the audit logs with timestamps ,as a md or txt file  [/plan](slashCommand;plan)  also implement pagination on the table max:5 entries.if anything needed attention the page no blinks until read.(like changes in state of the worker,room,etc).and as said in the agent.txt implement the opt features.
+
+to handle mistakes 1 single action revert button(reverts the last action and logs it in the log as reverted ) and a delete a action or a worker or room a small delete button in red (bin icon) not emoji 

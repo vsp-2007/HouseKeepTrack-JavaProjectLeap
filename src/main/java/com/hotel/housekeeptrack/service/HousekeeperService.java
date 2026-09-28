@@ -3,6 +3,7 @@ package com.hotel.housekeeptrack.service;
 import com.hotel.housekeeptrack.dto.CreateHousekeeperRequest;
 import com.hotel.housekeeptrack.exception.BusinessRuleException;
 import com.hotel.housekeeptrack.exception.ResourceNotFoundException;
+import com.hotel.housekeeptrack.model.AuditAction;
 import com.hotel.housekeeptrack.model.CleaningTask;
 import com.hotel.housekeeptrack.model.Housekeeper;
 import com.hotel.housekeeptrack.model.HousekeeperStatus;
@@ -12,13 +13,14 @@ import com.hotel.housekeeptrack.model.TaskStatus;
 import com.hotel.housekeeptrack.repository.CleaningTaskRepository;
 import com.hotel.housekeeptrack.repository.HousekeeperRepository;
 import com.hotel.housekeeptrack.repository.RoomRepository;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 /**
- * Service managing housekeeper staff members and availability transitions.
+ * Service managing housekeeper staff members, availability transitions, and audit logging.
  */
 @Service
 public class HousekeeperService {
@@ -27,24 +29,31 @@ public class HousekeeperService {
     private final CleaningTaskService cleaningTaskService;
     private final CleaningTaskRepository cleaningTaskRepository;
     private final RoomRepository roomRepository;
+    private final AuditLogService auditLogService;
 
     public HousekeeperService(HousekeeperRepository housekeeperRepository,
                               CleaningTaskService cleaningTaskService,
                               CleaningTaskRepository cleaningTaskRepository,
-                              RoomRepository roomRepository) {
+                              RoomRepository roomRepository,
+                              AuditLogService auditLogService) {
         this.housekeeperRepository = housekeeperRepository;
         this.cleaningTaskService = cleaningTaskService;
         this.cleaningTaskRepository = cleaningTaskRepository;
         this.roomRepository = roomRepository;
+        this.auditLogService = auditLogService;
     }
 
     @Transactional
+    @CacheEvict(value = {"housekeeperWorkloads", "systemSummary"}, allEntries = true)
     public Housekeeper createHousekeeper(CreateHousekeeperRequest request) {
         if (housekeeperRepository.existsByEmail(request.getEmail())) {
             throw new BusinessRuleException("Housekeeper with email " + request.getEmail() + " already exists.");
         }
         Housekeeper housekeeper = new Housekeeper(request.getName(), request.getEmail(), request.getPhone());
         housekeeper = housekeeperRepository.save(housekeeper);
+
+        auditLogService.log(AuditAction.STAFF_REGISTERED, "Housekeeper", housekeeper.getId(), "Admin",
+                "Registered housekeeper " + housekeeper.getName() + " (" + housekeeper.getEmail() + ")");
 
         // If newly added housekeeper is available, dispatch any existing pending tasks
         cleaningTaskService.dispatchToAvailableHousekeepers();
@@ -72,6 +81,7 @@ public class HousekeeperService {
      * - If transitioning to AVAILABLE: verifies no active tasks are ongoing, then triggers queue dispatch.
      */
     @Transactional
+    @CacheEvict(value = {"housekeeperWorkloads", "systemSummary", "rooms"}, allEntries = true)
     public Housekeeper updateStatus(Long id, HousekeeperStatus status) {
         Housekeeper housekeeper = getHousekeeperById(id);
 
@@ -94,6 +104,9 @@ public class HousekeeperService {
             housekeeper.setActiveTaskCount(0);
             housekeeper = housekeeperRepository.save(housekeeper);
 
+            auditLogService.log(AuditAction.STAFF_STATUS_CHANGED, "Housekeeper", housekeeper.getId(), "Admin",
+                    "Status updated to OFFLINE for housekeeper " + housekeeper.getName());
+
             // Re-dispatch orphaned tasks to other available staff
             cleaningTaskService.dispatchToAvailableHousekeepers();
             return housekeeper;
@@ -105,11 +118,20 @@ public class HousekeeperService {
             }
             housekeeper.setStatus(HousekeeperStatus.AVAILABLE);
             housekeeper = housekeeperRepository.save(housekeeper);
+
+            auditLogService.log(AuditAction.STAFF_STATUS_CHANGED, "Housekeeper", housekeeper.getId(), "Admin",
+                    "Status updated to AVAILABLE for housekeeper " + housekeeper.getName());
+
             cleaningTaskService.dispatchToAvailableHousekeepers();
             return housekeeper;
         }
 
         housekeeper.setStatus(status);
-        return housekeeperRepository.save(housekeeper);
+        housekeeper = housekeeperRepository.save(housekeeper);
+
+        auditLogService.log(AuditAction.STAFF_STATUS_CHANGED, "Housekeeper", housekeeper.getId(), "Admin",
+                "Status updated to " + status + " for housekeeper " + housekeeper.getName());
+
+        return housekeeper;
     }
 }

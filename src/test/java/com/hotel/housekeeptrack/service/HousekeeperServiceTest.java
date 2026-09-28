@@ -38,6 +38,9 @@ class HousekeeperServiceTest {
     @Mock
     private RoomRepository roomRepository;
 
+    @Mock
+    private AuditLogService auditLogService;
+
     @InjectMocks
     private HousekeeperService housekeeperService;
 

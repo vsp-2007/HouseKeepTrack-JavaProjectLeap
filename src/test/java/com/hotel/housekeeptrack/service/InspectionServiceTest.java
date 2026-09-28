@@ -34,6 +34,9 @@ class InspectionServiceTest {
     @Mock
     private CleaningTaskService cleaningTaskService;
 
+    @Mock
+    private AuditLogService auditLogService;
+
     @InjectMocks
     private InspectionService inspectionService;
 

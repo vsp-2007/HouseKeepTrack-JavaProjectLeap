@@ -5,6 +5,7 @@ import com.hotel.housekeeptrack.repository.CleaningTaskRepository;
 import com.hotel.housekeeptrack.repository.HousekeeperRepository;
 import com.hotel.housekeeptrack.repository.RoomRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,16 +21,19 @@ public class CleaningTaskService {
     private final CleaningTaskRepository cleaningTaskRepository;
     private final HousekeeperRepository housekeeperRepository;
     private final RoomRepository roomRepository;
+    private final AuditLogService auditLogService;
 
     @Value("${housekeeptrack.escalation.threshold-minutes:15}")
     private long escalationThresholdMinutes;
 
     public CleaningTaskService(CleaningTaskRepository cleaningTaskRepository,
                                HousekeeperRepository housekeeperRepository,
-                               RoomRepository roomRepository) {
+                               RoomRepository roomRepository,
+                               AuditLogService auditLogService) {
         this.cleaningTaskRepository = cleaningTaskRepository;
         this.housekeeperRepository = housekeeperRepository;
         this.roomRepository = roomRepository;
+        this.auditLogService = auditLogService;
     }
 
     /**
@@ -37,6 +41,7 @@ public class CleaningTaskService {
      * then attempts immediate dispatch to an available housekeeper.
      */
     @Transactional
+    @CacheEvict(value = {"rooms", "systemSummary", "housekeeperWorkloads"}, allEntries = true)
     public CleaningTask createAndDispatchTask(Room room, TaskPriority priority, String notes) {
         CleaningTask task = new CleaningTask(room, priority, notes);
         task = cleaningTaskRepository.save(task);
@@ -59,6 +64,7 @@ public class CleaningTaskService {
      * 3. Oldest FIFO by creation time within same priority band.
      */
     @Transactional
+    @CacheEvict(value = {"rooms", "systemSummary", "housekeeperWorkloads"}, allEntries = true)
     public void dispatchToAvailableHousekeepers() {
         escalateLongWaitingTasks();
 
@@ -99,6 +105,11 @@ public class CleaningTaskService {
             room.setActiveCleaningTaskId(task.getId());
             roomRepository.save(room);
 
+            // Record audit log entry
+            auditLogService.log(AuditAction.TASK_ASSIGNED, "CleaningTask", task.getId(), housekeeper.getName(),
+                    "Assigned task #" + task.getId() + " (" + task.getPriority() + " priority) for room " +
+                            room.getRoomNumber() + " to housekeeper " + housekeeper.getName());
+
             housekeeperIndex++;
         }
     }
@@ -108,6 +119,7 @@ public class CleaningTaskService {
      * frees the housekeeper, and immediately dispatches the next highest-priority task.
      */
     @Transactional
+    @CacheEvict(value = {"rooms", "systemSummary", "roomTurnaround", "housekeeperWorkloads"}, allEntries = true)
     public CleaningTask completeTask(Long taskId) {
         CleaningTask task = cleaningTaskRepository.findById(taskId)
                 .orElseThrow(() -> new com.hotel.housekeeptrack.exception.ResourceNotFoundException("CleaningTask not found with ID: " + taskId));
@@ -135,6 +147,11 @@ public class CleaningTaskService {
             }
             housekeeperRepository.save(housekeeper);
         }
+
+        // Record audit log
+        String worker = (housekeeper != null) ? housekeeper.getName() : "Staff";
+        auditLogService.log(AuditAction.TASK_COMPLETED, "CleaningTask", task.getId(), worker,
+                "Completed cleaning task #" + task.getId() + " for room " + room.getRoomNumber());
 
         // Newly available housekeeper can now take the next pending task in queue
         dispatchToAvailableHousekeepers();

@@ -5,6 +5,8 @@ import com.hotel.housekeeptrack.dto.RoomResponse;
 import com.hotel.housekeeptrack.model.Room;
 import com.hotel.housekeeptrack.model.RoomStatus;
 import com.hotel.housekeeptrack.service.RoomService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -33,6 +35,12 @@ public class RoomPresenter {
     public ResponseEntity<List<RoomResponse>> presentRooms(RoomStatus status) {
         List<Room> rooms = (status != null) ? roomService.getRoomsByStatus(status) : roomService.getAllRooms();
         List<RoomResponse> responses = rooms.stream().map(RoomResponse::fromEntity).collect(Collectors.toList());
+        return ResponseEntity.ok(responses);
+    }
+
+    public ResponseEntity<Page<RoomResponse>> presentRoomsPage(RoomStatus status, Pageable pageable) {
+        Page<Room> rooms = roomService.getRoomsPaginated(status, pageable);
+        Page<RoomResponse> responses = rooms.map(RoomResponse::fromEntity);
         return ResponseEntity.ok(responses);
     }
 

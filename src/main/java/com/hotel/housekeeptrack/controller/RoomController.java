@@ -5,6 +5,9 @@ import com.hotel.housekeeptrack.dto.RoomResponse;
 import com.hotel.housekeeptrack.model.RoomStatus;
 import com.hotel.housekeeptrack.presenter.RoomPresenter;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,7 +33,26 @@ public class RoomController {
     }
 
     @GetMapping
-    public ResponseEntity<List<RoomResponse>> getAllRooms(@RequestParam(required = false) RoomStatus status) {
+    public ResponseEntity<?> getAllRooms(
+            @RequestParam(required = false) RoomStatus status,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size,
+            @RequestParam(required = false) String sort) {
+        if (page != null) {
+            int pageSize = (size != null && size > 0) ? size : 5;
+            Sort sorting = Sort.by("id").ascending();
+            if (sort != null && !sort.isBlank()) {
+                String[] parts = sort.split(",");
+                if (parts.length > 1) {
+                    Sort.Direction dir = parts[1].trim().equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+                    sorting = Sort.by(dir, parts[0].trim());
+                } else {
+                    sorting = Sort.by(parts[0].trim());
+                }
+            }
+            Pageable pageable = PageRequest.of(page, pageSize, sorting);
+            return roomPresenter.presentRoomsPage(status, pageable);
+        }
         return roomPresenter.presentRooms(status);
     }
 
